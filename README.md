@@ -141,3 +141,8 @@ This project was created as part of a personal portfolio to demonstrate applied 
 > 🔲 Complete terraform deployment
 > 🔲 CloudWatch logs
 
+## Resources
+
+- [Didacticiel : création d’une API HTTP CRUD avec Lambda et DynamoDB](https://docs.aws.amazon.com/fr_fr/apigateway/latest/developerguide/http-api-dynamo-db.html#http-api-dynamo-db-create-function)
+- [https://developer.hashicorp.com/terraform/tutorials/aws/lambda-api-gateway](https://developer.hashicorp.com/terraform/tutorials/aws/lambda-api-gateway)
+
