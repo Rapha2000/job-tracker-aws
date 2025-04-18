@@ -131,4 +131,5 @@ This project was created as part of a personal portfolio to demonstrate applied 
 > ✅ Repo initialized 
 > 🔲 Terraform minimal 
 > 🔲 Archi schema 
-> 🔲 README complete
+> ✅ README complete
+
