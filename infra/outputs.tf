@@ -5,3 +5,9 @@ output "lambda_bucket_name" {
 
   value = aws_s3_bucket.lambda_create_bucket.id
 }
+
+output "create_function_name" {
+  description = "Name of the 'createApplication' Lambda function."
+
+  value = aws_lambda_function.createApplication.function_name
+}
