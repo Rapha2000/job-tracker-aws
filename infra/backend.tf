@@ -7,4 +7,4 @@ terraform {
   }
 }
 
-# specify path to the config file at init: `terraform init -backend-config="./state.config"`
+# specify path to the config file at init: `terraform init -backend-config="./backend.config"`
