@@ -129,7 +129,15 @@ This project was created as part of a personal portfolio to demonstrate applied 
 
 > Phase 0 - Initialization
 > ✅ Repo initialized 
-> 🔲 Terraform minimal 
-> 🔲 Archi schema 
+> ✅ Terraform minimal 
+> ✅ Archi schema 
 > ✅ README complete
+
+> Phase 1 - Backend MVP
+> 🔲 Lambda (endpoints CRUD)
+> 🔲 DynamoDB
+> 🔲 API Gateway REST
+> 🔲 Curl tests
+> 🔲 Complete terraform deployment
+> 🔲 CloudWatch logs
 
