@@ -9,12 +9,65 @@ provider "aws" {
 }
 
 ############################################################################################################################
-######## Creating the bucket and associated policies that will be used to store the archive containing the function ########
-######## source code and any dependencies ##################################################################################
+######## Creating the DynamoDB table that will be used to store the job tracker application data ###########################
+############################################################################################################################
+resource "aws_dynamodb_table" "applications_dynamodb_table" {
+  name         = "job_applications"
+  billing_mode = "PAY_PER_REQUEST" # auto-scale sans provisioning
+
+  hash_key  = "user_id"
+  range_key = "job_id"
+
+  attribute {
+    name = "user_id"
+    type = "S"
+  }
+
+  attribute {
+    name = "job_id"
+    type = "S"
+  }
+
+  tags = {
+    Environment = "dev"
+    Project     = "job-tracker-aws"
+  }
+}
+
+# corresponding IAM policy that will be attached to the lambda functions
+resource "aws_iam_policy" "dynamodb_access_policy" {
+  name        = "lambda-dynamodb-policy"
+  description = "Allow Lambda to read/write to DynamoDB table"
+
+  # Terraform's "jsonencode" function converts a
+  # Terraform expression result to valid JSON syntax.
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = [
+          "dynamodb:PutItem",
+          "dynamodb:GetItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:Scan",
+          "dynamodb:Query"
+        ]
+        Effect   = "Allow"
+        Resource = aws_dynamodb_table.applications_dynamodb_table.arn
+      },
+    ]
+  })
+}
+
+
+############################################################################################################################
+######## Creating the bucket and associated policies that will be used to store the archive containing the createApplication
+######## function source code and dependencies #############################################################################
 ############################################################################################################################
 resource "random_pet" "lambda_create_bucket_name" {
   prefix = "lambda-create-job-tracker-aws"
-  length = 4
+  length = 3
 }
 
 resource "aws_s3_bucket" "lambda_create_bucket" {
@@ -110,4 +163,9 @@ resource "aws_iam_role" "lambda_create_exec" {
 resource "aws_iam_role_policy_attachment" "lambda_create_policy" {
   role       = aws_iam_role.lambda_create_exec.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_create_dynamodb_policy" {
+  role       = aws_iam_role.lambda_create_exec.name
+  policy_arn = aws_iam_policy.dynamodb_access_policy.arn
 }
