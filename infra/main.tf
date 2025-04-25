@@ -62,37 +62,37 @@ resource "aws_iam_policy" "dynamodb_access_policy" {
 
 
 ############################################################################################################################
-######## 2. createApplication lambda #######################################################################################
+######## 2. Lambdas lambda #######################################################################################
 ############################################################################################################################
-######## 2.a. Creating the bucket and associated policies that will be used to store the archive containing the createApplication
-######## function source code and dependencies #############################################################################
+######## 2.a. Creating the bucket and associated policies that will be used to store the archive containing the
+######## functions source code and dependencies #############################################################################
 ############################################################################################################################
-resource "random_pet" "lambda_create_bucket_name" {
-  prefix = "lambda-create-job-tracker-aws"
+resource "random_pet" "lambdas_bucket_name" {
+  prefix = "lambdas-job-tracker-aws"
   length = 3
 }
 
-resource "aws_s3_bucket" "lambda_create_bucket" {
-  bucket = random_pet.lambda_create_bucket_name.id
+resource "aws_s3_bucket" "lambdas_bucket" {
+  bucket = random_pet.lambdas_bucket_name.id
 }
 
 # set the ownership of the bucket to the account that created it
-resource "aws_s3_bucket_ownership_controls" "lambda_create_bucket" {
-  bucket = aws_s3_bucket.lambda_create_bucket.id
+resource "aws_s3_bucket_ownership_controls" "lambda_bucket" {
+  bucket = aws_s3_bucket.lambdas_bucket.id
   rule {
     object_ownership = "BucketOwnerPreferred"
   }
 }
 
-resource "aws_s3_bucket_acl" "lambda_create_bucket" {
-  depends_on = [aws_s3_bucket_ownership_controls.lambda_create_bucket]
+resource "aws_s3_bucket_acl" "lambdas_bucket" {
+  depends_on = [aws_s3_bucket_ownership_controls.lambda_bucket]
 
-  bucket = aws_s3_bucket.lambda_create_bucket.id
+  bucket = aws_s3_bucket.lambdas_bucket.id
   acl    = "private"
 }
 
-resource "aws_s3_bucket_public_access_block" "lambda_create_bucket" {
-  bucket = aws_s3_bucket.lambda_create_bucket.id
+resource "aws_s3_bucket_public_access_block" "lambdas_bucket" {
+  bucket = aws_s3_bucket.lambdas_bucket.id
 
   block_public_acls       = true
   block_public_policy     = true
@@ -101,8 +101,9 @@ resource "aws_s3_bucket_public_access_block" "lambda_create_bucket" {
 }
 
 ############################################################################################################
-######## 2.b. Packaging and copying the createApplication lambda function to its corresponding S3 bucket ########
+######## 2.b. Packaging and copying the lambda functions to the S3 bucket ########
 ############################################################################################################
+# createApplication lambda function
 data "archive_file" "lambda_create" {
   type = "zip"
 
@@ -111,7 +112,7 @@ data "archive_file" "lambda_create" {
 }
 
 resource "aws_s3_object" "lambda_create" {
-  bucket = aws_s3_bucket.lambda_create_bucket.id
+  bucket = aws_s3_bucket.lambdas_bucket.id
   key    = "createApplication.zip"
   source = data.archive_file.lambda_create.output_path
 
@@ -121,31 +122,29 @@ resource "aws_s3_object" "lambda_create" {
   etag = filemd5(data.archive_file.lambda_create.output_path)
 }
 
-######################################################################################
-######## 2.c. Defining the createApplication lambda function and related resources ###
-######################################################################################
-resource "aws_lambda_function" "createApplication" {
-  function_name = "createApplication"
-  description   = "Create a new application in the job tracker system"
+# deleteApplication lambda function
+data "archive_file" "lambda_delete" {
+  type = "zip"
 
-  s3_bucket = aws_s3_bucket.lambda_create_bucket.id
-  s3_key    = aws_s3_object.lambda_create.key
-
-  runtime = "python3.9"
-  handler = "main.lambda_handler" # entrypoint of the lambda function
-
-  source_code_hash = data.archive_file.lambda_create.output_base64sha256
-
-  role = aws_iam_role.lambda_create_exec.arn
+  source_dir  = "${path.module}/../backend/lambdas/deleteApplication/"
+  output_path = "${path.module}/../backend/lambdas/deleteApplication/deleteApplication.zip"
 }
 
-resource "aws_cloudwatch_log_group" "createApplication" {
-  name = "/aws/lambda/${aws_lambda_function.createApplication.function_name}"
+resource "aws_s3_object" "lambda_delete" {
+  bucket = aws_s3_bucket.lambdas_bucket.id
+  key    = "deleteApplication.zip"
+  source = data.archive_file.lambda_delete.output_path
 
-  retention_in_days = 7
+  # The filemd5() function is available in Terraform 0.11.12 and later
+  # For Terraform 0.11.11 and earlier, use the md5() function and the file() function:
+  # etag = "${md5(file("path/to/file"))}"
+  etag = filemd5(data.archive_file.lambda_delete.output_path)
 }
 
-resource "aws_iam_role" "lambda_create_exec" {
+######################################################################################
+######## 2.c. Defining the lambda functions and related resources ###
+######################################################################################
+resource "aws_iam_role" "lambda_exec" {
   name = "serverless_lambda"
 
   assume_role_policy = jsonencode({
@@ -162,32 +161,83 @@ resource "aws_iam_role" "lambda_create_exec" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_create_policy" {
-  role       = aws_iam_role.lambda_create_exec.name
+resource "aws_iam_role_policy_attachment" "lambda_policy" {
+  role       = aws_iam_role.lambda_exec.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_create_dynamodb_policy" {
-  role       = aws_iam_role.lambda_create_exec.name
+resource "aws_iam_role_policy_attachment" "lambda_dynamodb_policy" {
+  role       = aws_iam_role.lambda_exec.name
   policy_arn = aws_iam_policy.dynamodb_access_policy.arn
 }
 
-######################################################################################
-######## 3. Creating the HTTP API Gateway that will be used to trigger the createApplication lambda function
-######################################################################################
-resource "aws_apigatewayv2_api" "createApplication_lambda" {
-  name          = "createApplication"
-  protocol_type = "HTTP"
-  description   = "API Gateway for createApplication lambda function"
+# createApplication lambda function
+resource "aws_lambda_function" "createApplication" {
+  function_name = "createApplication"
+  description   = "Create a new application in the job tracker system"
+
+  s3_bucket = aws_s3_bucket.lambdas_bucket.id
+  s3_key    = aws_s3_object.lambda_create.key
+
+  runtime = "python3.9"
+  handler = "main.lambda_handler" # entrypoint of the lambda function
+
+  source_code_hash = data.archive_file.lambda_create.output_base64sha256
+
+  role = aws_iam_role.lambda_exec.arn
 }
 
-resource "aws_apigatewayv2_stage" "createApplication_lambda_stage" {
-  api_id      = aws_apigatewayv2_api.createApplication_lambda.id
+resource "aws_cloudwatch_log_group" "createApplication" {
+  name = "/aws/lambda/${aws_lambda_function.createApplication.function_name}"
+
+  retention_in_days = 7
+}
+
+# deleteApplication lambda function
+resource "aws_lambda_function" "deleteApplication" {
+  function_name = "deleteApplication"
+  description   = "Delete a new application in the job tracker system"
+
+  s3_bucket = aws_s3_bucket.lambdas_bucket.id
+  s3_key    = aws_s3_object.lambda_delete.key
+
+  runtime = "python3.9"
+  handler = "main.lambda_handler" # entrypoint of the lambda function
+
+  source_code_hash = data.archive_file.lambda_delete.output_base64sha256
+
+  role = aws_iam_role.lambda_exec.arn
+}
+
+resource "aws_cloudwatch_log_group" "deleteApplication" {
+  name = "/aws/lambda/${aws_lambda_function.deleteApplication.function_name}"
+
+  retention_in_days = 7
+}
+
+
+######################################################################################
+######## 3. Creating the HTTP API Gateway that will be used to trigger the lambda functions
+######################################################################################
+resource "aws_apigatewayv2_api" "job_tracker_api" {
+  name          = "job-tracker-api"
+  protocol_type = "HTTP"
+  description   = "API Gateway for the job tracker application"
+}
+
+resource "aws_cloudwatch_log_group" "log_group_api_gw" {
+  name = "/aws/apigateway/job-tracker-api"
+
+  retention_in_days = 7
+}
+
+resource "aws_apigatewayv2_stage" "lambda_stage" {
+  api_id      = aws_apigatewayv2_api.job_tracker_api.id
   name        = "dev"
   auto_deploy = true
 
   access_log_settings {
-    destination_arn = aws_cloudwatch_log_group.createApplication.arn
+    destination_arn = aws_cloudwatch_log_group.log_group_api_gw.arn
 
     format = jsonencode({
       requestId               = "$context.requestId"
@@ -205,8 +255,9 @@ resource "aws_apigatewayv2_stage" "createApplication_lambda_stage" {
   }
 }
 
+# createApplication route
 resource "aws_apigatewayv2_integration" "createApplication_lambda_integration" {
-  api_id = aws_apigatewayv2_api.createApplication_lambda.id
+  api_id = aws_apigatewayv2_api.job_tracker_api.id
 
   integration_uri    = aws_lambda_function.createApplication.invoke_arn
   integration_type   = "AWS_PROXY"
@@ -214,16 +265,10 @@ resource "aws_apigatewayv2_integration" "createApplication_lambda_integration" {
 }
 
 resource "aws_apigatewayv2_route" "createApplication_lambda_route" {
-  api_id = aws_apigatewayv2_api.createApplication_lambda.id
+  api_id = aws_apigatewayv2_api.job_tracker_api.id
 
   route_key = "POST /createApplication"
   target    = "integrations/${aws_apigatewayv2_integration.createApplication_lambda_integration.id}"
-}
-
-resource "aws_cloudwatch_log_group" "createApplication_api_gw" {
-  name = "/aws/apigateway/${aws_apigatewayv2_api.createApplication_lambda.name}"
-
-  retention_in_days = 7
 }
 
 resource "aws_lambda_permission" "createApplication_api_gw" {
@@ -232,5 +277,32 @@ resource "aws_lambda_permission" "createApplication_api_gw" {
   function_name = aws_lambda_function.createApplication.function_name
   principal     = "apigateway.amazonaws.com"
 
-  source_arn = "${aws_apigatewayv2_api.createApplication_lambda.execution_arn}/*/*"
+  source_arn = "${aws_apigatewayv2_api.job_tracker_api.execution_arn}/*/*"
 }
+
+# deleteApplication route
+resource "aws_apigatewayv2_integration" "deleteApplication_lambda_integration" {
+  api_id = aws_apigatewayv2_api.job_tracker_api.id
+
+  integration_uri    = aws_lambda_function.deleteApplication.invoke_arn
+  integration_type   = "AWS_PROXY"
+  integration_method = "POST"
+}
+
+resource "aws_apigatewayv2_route" "deleteApplication_lambda_route" {
+  api_id = aws_apigatewayv2_api.job_tracker_api.id
+
+  route_key = "POST /deleteApplication"
+  target    = "integrations/${aws_apigatewayv2_integration.deleteApplication_lambda_integration.id}"
+}
+
+resource "aws_lambda_permission" "deleteApplication_api_gw" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.deleteApplication.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_apigatewayv2_api.job_tracker_api.execution_arn}/*/*"
+}
+
+
