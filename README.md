@@ -92,10 +92,10 @@ Planned modules:
 
 ## 📆 Project Timeline
 
-| Phase                | Timeline        | Status        |
-|----------------------|-----------------|---------------|
-| Phase 0 – Setup      | April 2025      | ✅ In progress |
-| Phase 1 – Backend MVP| May 2025        | ⏳ Planned     |
+| Phase                | Timeline        | Status         |
+|----------------------|-----------------|----------------|
+| Phase 0 – Setup      | April 2025      | ✅ Done        |
+| Phase 1 – Backend MVP| May 2025        | 🚧 In Progress |
 | Phase 2 – CI/CD/Auth | June 2025       | ⏳ Planned     |
 | Phase 3 – Frontend   | July 2025       | ⏳ Planned     |
 | Phase 4 – Polish     | Late July 2025  | ⏳ Planned     |
@@ -107,8 +107,6 @@ Planned modules:
 **Raphael** – Cloud/DevOps enthusiast with a generalist engineering background.  
 Interested in solution architecture, cloud-native design, and scalable applications.  
 This project was created as part of a personal portfolio to demonstrate applied cloud knowledge.
-
-
 
 
 ## 🔧 Tech Stack
@@ -134,10 +132,10 @@ This project was created as part of a personal portfolio to demonstrate applied 
 > ✅ README complete
 
 > Phase 1 - Backend MVP
-> 🔲 Lambda (endpoints CRUD)
-> 🔲 DynamoDB
-> 🔲 API Gateway REST
-> 🔲 Curl tests
+> 🔲 Lambda (endpoints CRUD --> 1/4)
+> ✅ DynamoDB
+> 🔲 API Gateway REST (1/4)
+> 🔲 Curl tests (1/4)
 > 🔲 Complete terraform deployment
 > 🔲 CloudWatch logs
 
