@@ -84,3 +84,16 @@ def lambda_handler(event, context):
     #     "body": body
     # }
     # return res
+
+
+# curl -X POST "$(terraform output -raw api_base_url)/createApplication" \
+#   -H "Content-Type: application/json" \
+#   -d '{
+#     "user_id": "test-user",
+#     "company": "OpenAI",
+#     "position": "Software Engineer",
+#     "status": "applied",
+#     "date_applied": "2025-04-25T15:00:00Z",
+#     "notes": "Resume attached",
+#     "tags": ["AI", "priority"]
+#   }'
