@@ -9,7 +9,7 @@ provider "aws" {
 }
 
 ############################################################################################################################
-######## Creating the DynamoDB table that will be used to store the job tracker application data ###########################
+######## 1. Creating the DynamoDB table that will be used to store the job tracker application data ###########################
 ############################################################################################################################
 resource "aws_dynamodb_table" "applications_dynamodb_table" {
   name         = "job_applications"
@@ -62,7 +62,9 @@ resource "aws_iam_policy" "dynamodb_access_policy" {
 
 
 ############################################################################################################################
-######## Creating the bucket and associated policies that will be used to store the archive containing the createApplication
+######## 2. createApplication lambda #######################################################################################
+############################################################################################################################
+######## 2.a. Creating the bucket and associated policies that will be used to store the archive containing the createApplication
 ######## function source code and dependencies #############################################################################
 ############################################################################################################################
 resource "random_pet" "lambda_create_bucket_name" {
@@ -99,7 +101,7 @@ resource "aws_s3_bucket_public_access_block" "lambda_create_bucket" {
 }
 
 ############################################################################################################
-######## Packaging and copying the createApplication lambda function to its corresponding S3 bucket ########
+######## 2.b. Packaging and copying the createApplication lambda function to its corresponding S3 bucket ########
 ############################################################################################################
 data "archive_file" "lambda_create" {
   type = "zip"
@@ -120,7 +122,7 @@ resource "aws_s3_object" "lambda_create" {
 }
 
 ######################################################################################
-######## Defining the createApplication lambda function and related resources ########
+######## 2.c. Defining the createApplication lambda function and related resources ###
 ######################################################################################
 resource "aws_lambda_function" "createApplication" {
   function_name = "createApplication"
@@ -168,4 +170,67 @@ resource "aws_iam_role_policy_attachment" "lambda_create_policy" {
 resource "aws_iam_role_policy_attachment" "lambda_create_dynamodb_policy" {
   role       = aws_iam_role.lambda_create_exec.name
   policy_arn = aws_iam_policy.dynamodb_access_policy.arn
+}
+
+######################################################################################
+######## 3. Creating the HTTP API Gateway that will be used to trigger the createApplication lambda function
+######################################################################################
+resource "aws_apigatewayv2_api" "createApplication_lambda" {
+  name          = "createApplication"
+  protocol_type = "HTTP"
+  description   = "API Gateway for createApplication lambda function"
+}
+
+resource "aws_apigatewayv2_stage" "createApplication_lambda_stage" {
+  api_id      = aws_apigatewayv2_api.createApplication_lambda.id
+  name        = "dev"
+  auto_deploy = true
+
+  access_log_settings {
+    destination_arn = aws_cloudwatch_log_group.createApplication.arn
+
+    format = jsonencode({
+      requestId               = "$context.requestId"
+      sourceIp                = "$context.identity.sourceIp"
+      requestTime             = "$context.requestTime"
+      protocol                = "$context.protocol"
+      httpMethod              = "$context.httpMethod"
+      resourcePath            = "$context.resourcePath"
+      routeKey                = "$context.routeKey"
+      status                  = "$context.status"
+      responseLength          = "$context.responseLength"
+      integrationErrorMessage = "$context.integrationErrorMessage"
+      }
+    )
+  }
+}
+
+resource "aws_apigatewayv2_integration" "createApplication_lambda_integration" {
+  api_id = aws_apigatewayv2_api.createApplication_lambda.id
+
+  integration_uri    = aws_lambda_function.createApplication.invoke_arn
+  integration_type   = "AWS_PROXY"
+  integration_method = "POST"
+}
+
+resource "aws_apigatewayv2_route" "createApplication_lambda_route" {
+  api_id = aws_apigatewayv2_api.createApplication_lambda.id
+
+  route_key = "POST /createApplication"
+  target    = "integrations/${aws_apigatewayv2_integration.createApplication_lambda_integration.id}"
+}
+
+resource "aws_cloudwatch_log_group" "createApplication_api_gw" {
+  name = "/aws/apigateway/${aws_apigatewayv2_api.createApplication_lambda.name}"
+
+  retention_in_days = 7
+}
+
+resource "aws_lambda_permission" "createApplication_api_gw" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.createApplication.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_apigatewayv2_api.createApplication_lambda.execution_arn}/*/*"
 }

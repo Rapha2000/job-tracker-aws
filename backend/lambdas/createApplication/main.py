@@ -1,3 +1,4 @@
+import base64
 import json
 import boto3
 import uuid
@@ -18,7 +19,14 @@ def lambda_handler(event, context):
     }
 
     try:
-        body = json.loads(event)
+        if event.get("isBase64Encoded", False):
+            decoded_body = base64.b64decode(event.get("body", "")).decode("utf-8")
+        else:
+            decoded_body = event.get("body", "")
+
+        print("Decoded body:", decoded_body)
+        body = json.loads(decoded_body)
+
         print("Parsed body:", body)
         user_id = body.get('user_id') 
         if not user_id:
