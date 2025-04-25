@@ -18,6 +18,12 @@ output "delete_function_name" {
   value = aws_lambda_function.deleteApplication.function_name
 }
 
+output "get_function_name" {
+  description = "Name of the 'getApplications' Lambda function."
+
+  value = aws_lambda_function.getApplications.function_name
+}
+
 output "api_base_url" {
   description = "Base URL for API Gateway stage."
 

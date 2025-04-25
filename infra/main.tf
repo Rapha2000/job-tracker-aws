@@ -141,6 +141,25 @@ resource "aws_s3_object" "lambda_delete" {
   etag = filemd5(data.archive_file.lambda_delete.output_path)
 }
 
+# getApplications lamnda function
+data "archive_file" "lambda_get" {
+  type = "zip"
+
+  source_dir  = "${path.module}/../backend/lambdas/getApplications/"
+  output_path = "${path.module}/../backend/lambdas/getApplications/getApplications.zip"
+}
+
+resource "aws_s3_object" "lambda_get" {
+  bucket = aws_s3_bucket.lambdas_bucket.id
+  key    = "getApplication.zip"
+  source = data.archive_file.lambda_get.output_path
+
+  # The filemd5() function is available in Terraform 0.11.12 and later
+  # For Terraform 0.11.11 and earlier, use the md5() function and the file() function:
+  # etag = "${md5(file("path/to/file"))}"
+  etag = filemd5(data.archive_file.lambda_get.output_path)
+}
+
 ######################################################################################
 ######## 2.c. Defining the lambda functions and related resources ###
 ######################################################################################
@@ -215,6 +234,26 @@ resource "aws_cloudwatch_log_group" "deleteApplication" {
   retention_in_days = 7
 }
 
+# getApplications lambda function
+resource "aws_lambda_function" "getApplications" {
+  function_name = "getApplications"
+  description   = "Get all applications in the job tracker system"
+
+  s3_bucket = aws_s3_bucket.lambdas_bucket.id
+  s3_key    = aws_s3_object.lambda_get.key
+
+  runtime = "python3.9"
+  handler = "main.lambda_handler" # entrypoint of the lambda function
+
+  source_code_hash = data.archive_file.lambda_get.output_base64sha256
+  role             = aws_iam_role.lambda_exec.arn
+}
+
+resource "aws_cloudwatch_log_group" "getApplications" {
+  name = "/aws/lambda/${aws_lambda_function.getApplications.function_name}"
+
+  retention_in_days = 7
+}
 
 ######################################################################################
 ######## 3. Creating the HTTP API Gateway that will be used to trigger the lambda functions
@@ -300,6 +339,31 @@ resource "aws_lambda_permission" "deleteApplication_api_gw" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.deleteApplication.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_apigatewayv2_api.job_tracker_api.execution_arn}/*/*"
+}
+
+# getApplications route
+resource "aws_apigatewayv2_integration" "getApplications_lambda_integration" {
+  api_id = aws_apigatewayv2_api.job_tracker_api.id
+
+  integration_uri    = aws_lambda_function.getApplications.invoke_arn
+  integration_type   = "AWS_PROXY"
+  integration_method = "POST"
+}
+
+resource "aws_apigatewayv2_route" "getApplications_lambda_route" {
+  api_id = aws_apigatewayv2_api.job_tracker_api.id
+
+  route_key = "GET /applications"
+  target    = "integrations/${aws_apigatewayv2_integration.getApplications_lambda_integration.id}"
+}
+
+resource "aws_lambda_permission" "getApplications_api_gw" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.getApplications.function_name
   principal     = "apigateway.amazonaws.com"
 
   source_arn = "${aws_apigatewayv2_api.job_tracker_api.execution_arn}/*/*"

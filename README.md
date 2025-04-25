@@ -132,10 +132,10 @@ This project was created as part of a personal portfolio to demonstrate applied 
 > README complete ✅
 
 > Phase 1 - Backend MVP
-> Lambda (endpoints CRUD --> 2/4) 🔲 
+> Lambda (endpoints CRUD --> 3/4) 🔲 
 > DynamoDB ✅
-> API Gateway REST (2/4) 🔲
-> Curl tests (2/4) 🔲 
+> API Gateway REST (3/4) 🔲
+> Curl tests (3/4) 🔲 
 > Complete terraform deployment 🔲
 > CloudWatch logs 🔲
 
