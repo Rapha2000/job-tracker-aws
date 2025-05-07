@@ -160,6 +160,25 @@ resource "aws_s3_object" "lambda_get" {
   etag = filemd5(data.archive_file.lambda_get.output_path)
 }
 
+# updateApplication lambda function
+data "archive_file" "lambda_update" {
+  type = "zip"
+
+  source_dir  = "${path.module}/../backend/lambdas/updateApplication/"
+  output_path = "${path.module}/../backend/lambdas/updateApplication/updateApplication.zip"
+}
+
+resource "aws_s3_object" "lambda_update" {
+  bucket = aws_s3_bucket.lambdas_bucket.id
+  key    = "updateApplication.zip"
+  source = data.archive_file.lambda_update.output_path
+
+  # The filemd5() function is available in Terraform 0.11.12 and later
+  # For Terraform 0.11.11 and earlier, use the md5() function and the file() function:
+  # etag = "${md5(file("path/to/file"))}"
+  etag = filemd5(data.archive_file.lambda_update.output_path)
+}
+
 ######################################################################################
 ######## 2.c. Defining the lambda functions and related resources ###
 ######################################################################################
@@ -251,6 +270,27 @@ resource "aws_lambda_function" "getApplications" {
 
 resource "aws_cloudwatch_log_group" "getApplications" {
   name = "/aws/lambda/${aws_lambda_function.getApplications.function_name}"
+
+  retention_in_days = 7
+}
+
+# updateApplication lambda function
+resource "aws_lambda_function" "updateApplication" {
+  function_name = "updateApplication"
+  description   = "Update a new application in the job tracker system"
+
+  s3_bucket = aws_s3_bucket.lambdas_bucket.id
+  s3_key    = aws_s3_object.lambda_update.key
+
+  runtime = "python3.9"
+  handler = "main.lambda_handler" # entrypoint of the lambda function
+
+  source_code_hash = data.archive_file.lambda_update.output_base64sha256
+  role             = aws_iam_role.lambda_exec.arn
+}
+
+resource "aws_cloudwatch_log_group" "updateApplication" {
+  name = "/aws/lambda/${aws_lambda_function.updateApplication.function_name}"
 
   retention_in_days = 7
 }
@@ -364,6 +404,31 @@ resource "aws_lambda_permission" "getApplications_api_gw" {
   statement_id  = "AllowExecutionFromAPIGateway"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.getApplications.function_name
+  principal     = "apigateway.amazonaws.com"
+
+  source_arn = "${aws_apigatewayv2_api.job_tracker_api.execution_arn}/*/*"
+}
+
+# updateApplication route
+resource "aws_apigatewayv2_integration" "updateApplication_lambda_integration" {
+  api_id = aws_apigatewayv2_api.job_tracker_api.id
+
+  integration_uri    = aws_lambda_function.updateApplication.invoke_arn
+  integration_type   = "AWS_PROXY"
+  integration_method = "POST"
+}
+
+resource "aws_apigatewayv2_route" "updateApplication_lambda_route" {
+  api_id = aws_apigatewayv2_api.job_tracker_api.id
+
+  route_key = "PUT /updateApplication"
+  target    = "integrations/${aws_apigatewayv2_integration.updateApplication_lambda_integration.id}"
+}
+
+resource "aws_lambda_permission" "updateApplication_api_gw" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.updateApplication.function_name
   principal     = "apigateway.amazonaws.com"
 
   source_arn = "${aws_apigatewayv2_api.job_tracker_api.execution_arn}/*/*"
