@@ -19,15 +19,22 @@ jobs:
 
       - name: Create backend.config file  # this file is used to configure the remote backend for terraform
         run: |
+          cd infra
           echo "bucket = \"${{ secrets.AWS_TF_STATE_BUCKET_NAME }}\"" > backend.config
           echo "key = \"${{ secrets.AWS_TF_STATE_S3_KEY }}\"" >> backend.config
           echo "region = \"${{ secrets.AWS_REGION }}\"" >> backend.config
 
       - name: Terraform format check
-        run: terraform fmt -check -recursive ./infra
+        run: |
+          cd infra
+          terraform fmt -check -recursive
 
       - name: Terraform init
-        run: terraform init -backend-config="./backend.config" ./infra
+        run: |
+          cd infra
+          terraform init -backend-config="./backend.config"
 
       - name: Terraform Validate
-        run: terraform validate ./infra
+        run: |
+          cd infra
+          terraform validate
