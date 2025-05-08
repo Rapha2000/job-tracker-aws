@@ -85,8 +85,6 @@ RESPONSE=$(curl --fail -s -X PUT "$API_URL/updateApplication" \
   -d '{
     "job_id": "'"$JOB_ID"'",
     "user_id": "test-user",
-    "status": "interviewed",
-    "notes": "Interview scheduled for next week",
     "position": "ML Engineer",
     "company": "MistralAI",
   }')
