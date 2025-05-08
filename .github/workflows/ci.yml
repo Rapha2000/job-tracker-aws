@@ -46,4 +46,24 @@ jobs:
           terraform validate
         
   # 2nd job: Lint and Format the Lambda Python code
+  python:
+    name: Lint and Format Python
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set Up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: pip install black flake8
+
+      - name: Run black (formatting check)
+        run: black --check ./backend/lambdas
+
+      - name: Run flake8 (linting)
+        run: flake8 ./backend/lambdas
     
