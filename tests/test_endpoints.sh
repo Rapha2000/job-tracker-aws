@@ -122,6 +122,38 @@ fi
 
 echo "API test passed — application updated and verified successfully"
 
+# Step 4: test the deleteApplication endpoint
+echo "Sending request to: $API_URL/deleteApplication"
+
+RESPONSE=$(curl --fail -s -X POST "$API_URL/deleteApplication" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_id": "test-user",
+    "job_id": "'$JOB_ID'"
+  }')
+
+echo "Raw response:"
+echo "$RESPONSE"
+
+EXPECTED_MSG="Application with job_id $JOB_ID deleted successfuly."
+ACTUAL_MSG=$(echo "$RESPONSE" | jq -r '.message // empty')
+
+if [[ "$ACTUAL_MSG" != "$EXPECTED_MSG" ]]; then
+  echo "Test failed: unexpected delete message"
+  echo "Expected: $EXPECTED_MSG"
+  echo "Actual:   $ACTUAL_MSG"
+  exit 1
+fi
+
+echo "API test passed — application deleted successfully"
+
+
+echo "All API tests passed successfully!"
+
+
+
+
+
 
 
 
