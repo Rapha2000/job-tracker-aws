@@ -135,7 +135,7 @@ RESPONSE=$(curl --fail -s -X POST "$API_URL/deleteApplication" \
 echo "Raw response:"
 echo "$RESPONSE"
 
-EXPECTED_MSG="Application with job_id $JOB_ID deleted successfuly."
+EXPECTED_MSG="Application with job_id $JOB_ID deleted successfully."
 ACTUAL_MSG=$(echo "$RESPONSE" | jq -r '.message // empty')
 
 if [[ "$ACTUAL_MSG" != "$EXPECTED_MSG" ]]; then
