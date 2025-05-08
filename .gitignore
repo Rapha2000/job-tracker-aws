@@ -12,3 +12,5 @@ aws-resources-list.txt
 
 # Ignore backend configuration files
 infra/**.config
+
+venv
