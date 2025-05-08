@@ -24,10 +24,10 @@ jobs:
           echo "region = \"${{ secrets.AWS_REGION }}\"" >> backend.config
 
       - name: Terraform format check
-        run: terraform fmt -check -recursive
+        run: terraform fmt -check -recursive ./infra
 
       - name: Terraform init
-        run: terraform init -backend-config="./backend.config"
+        run: terraform init -backend-config="./backend.config" ./infra
 
       - name: Terraform Validate
-        run: terraform validate
+        run: terraform validate ./infra
