@@ -92,13 +92,13 @@ Planned modules:
 
 ## 📆 Project Timeline
 
-| Phase                | Timeline        | Status         |
-|----------------------|-----------------|----------------|
-| Phase 0 – Setup      | April 2025      | ✅ Done        |
-| Phase 1 – Backend MVP| May 2025        | 🚧 In Progress |
-| Phase 2 – CI/CD/Auth | June 2025       | ⏳ Planned     |
-| Phase 3 – Frontend   | July 2025       | ⏳ Planned     |
-| Phase 4 – Polish     | Late July 2025  | ⏳ Planned     |
+| Phase                 | Timeline        | Status         |
+|-----------------------|-----------------|----------------|
+| Phase 0 – Setup       | April 2025      | ✅ Done        |
+| Phase 1 – Backend MVP | May 2025        | ✅ Done        |
+| Phase 2 – CI/CD & Auth| May 2025        | 🚧 In Progress |
+| Phase 3 – Frontend    | July 2025       | ⏳ Planned     |
+| Phase 4 – Polish      | Late July 2025  | ⏳ Planned     |
 
 ---
 
@@ -132,12 +132,22 @@ This project was created as part of a personal portfolio to demonstrate applied 
 > README complete ✅
 
 > Phase 1 - Backend MVP
-> Lambda (endpoints CRUD --> 3/4) 🔲 
+> Lambda (endpoints CRUD --> 4/4) ✅ 
 > DynamoDB ✅
-> API Gateway REST (3/4) 🔲
-> Curl tests (3/4) 🔲 
-> Complete terraform deployment 🔲
-> CloudWatch logs 🔲
+> API Gateway REST (4/4) ✅
+> Curl tests (4/4) ✅ 
+> Complete terraform deployment ✅
+> CloudWatch logs ✅
+
+> Phase 2 - CI/CD & Auth
+> GitHub Actions : déploiement Lambda/API 🔲 
+> Ajout sécurité (API key ou début de Cognito) 🔲 
+> Alarmes simples 🔲 
+
+> Phase 3 - Frontend
+> Mini frontend React (formulaire + tableau) 🔲 
+> Hébergement sur S3 🔲 
+> Alarmes simples 🔲 
 
 ## Resources
 
