@@ -83,10 +83,22 @@ echo "Sending request to: $API_URL/updateApplication"
 RESPONSE=$(curl --fail -s -X PUT "$API_URL/updateApplication" \
   -H "Content-Type: application/json" \
   -d '{
-    "job_id": "'"$JOB_ID"'",
     "user_id": "test-user",
+    "job_id": "'$JOB_ID'",
     "position": "ML Engineer",
     "company": "MistralAI",
+  }')
+
+RESPONSE=$(curl --fail -s -X POST "$API_URL/createApplication" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_id": "test-user",
+    "company": "OpenAI",
+    "position": "Software Engineer",
+    "status": "applied",
+    "date_applied": "2025-04-25T15:00:00Z",
+    "notes": "Resume attached",
+    "tags": ["AI", "priority"]
   }')
 
 echo "Raw response:"
