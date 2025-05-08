@@ -11,7 +11,7 @@ jobs:
     name: Validate Terraform
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code        # checkout the code from the repository for the job to use it
+      - name: Checkout code        # checkout the code from the repository for the job to use it 
         uses: actions/checkout@v4
 
       - name: Set Up Terraform     # set up the terraform environment
