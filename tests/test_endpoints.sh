@@ -89,23 +89,11 @@ RESPONSE=$(curl --fail -s -X PUT "$API_URL/updateApplication" \
     "company": "MistralAI",
   }')
 
-RESPONSE=$(curl --fail -s -X POST "$API_URL/createApplication" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "user_id": "test-user",
-    "company": "OpenAI",
-    "position": "Software Engineer",
-    "status": "applied",
-    "date_applied": "2025-04-25T15:00:00Z",
-    "notes": "Resume attached",
-    "tags": ["AI", "priority"]
-  }')
-
 echo "Raw response:"
 echo "$RESPONSE"
 
 EXPECTED_MSG="Application $JOB_ID updated"
-ACTUAL_MSG=$(echo "$UPDATE_RESPONSE" | jq -r '.message // empty')
+ACTUAL_MSG=$(echo "$RESPONSE" | jq -r '.message // empty')
 
 if [[ "$ACTUAL_MSG" != "$EXPECTED_MSG" ]]; then
   echo "Test failed: unexpected update message"
