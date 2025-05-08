@@ -86,7 +86,7 @@ RESPONSE=$(curl --fail -s -X PUT "$API_URL/updateApplication" \
     "user_id": "test-user",
     "job_id": "'$JOB_ID'",
     "position": "ML Engineer",
-    "company": "MistralAI",
+    "company": "MistralAI"
   }')
 
 echo "Raw response:"
