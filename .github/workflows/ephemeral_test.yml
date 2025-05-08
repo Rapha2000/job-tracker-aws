@@ -1,0 +1,63 @@
+# Ephemeral Infra Test
+# temporarily deploy infra using terraform
+# execute functional tests: sending requests to the API endpoints
+# automatically destroy the infra after the tests
+
+name: Ephemeral Infra Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  ephemeral:
+    name: Deploy, Test, Destroy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set Up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Create backend.config file  # this file is used to configure the remote backend for terraform
+        run: |
+          cd infra
+          echo "bucket = \"${{ secrets.AWS_TF_STATE_BUCKET_NAME }}\"" > backend.config 
+          echo "key = \"${{ secrets.AWS_TF_STATE_S3_KEY }}\"" >> backend.config
+          echo "region = \"${{ secrets.AWS_REGION }}\"" >> backend.config
+        # these values need to be set in the repository secrets
+
+      - name: Terraform init
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          # these values need to be set in the repository secrets
+        run: |
+          cd infra
+          terraform init -backend-config="./backend.config"
+
+      - name: Terraform Apply
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          cd infra
+          terraform apply -auto-approve
+
+      - name: Wait for infra to be ready
+        run: sleep 15
+
+      - name: Test createApplication/ endpoint
+        run: |
+          chmod +x ./tests/endpoints/test_createApplication.sh
+          ./tests/endpoints/test_createApplication.sh $(cd infra && terraform output -raw api_base_url)
+      
+      - name: Terraform destroy
+        if: always() # always run this step so that if a test fails, the infra is still destroyed
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          cd infra
+          terraform destroy -auto-approve
