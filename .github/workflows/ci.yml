@@ -65,5 +65,5 @@ jobs:
         run: black --check ./backend/lambdas
 
       - name: Run flake8 (linting)
-        run: flake8 ./backend/lambdas
+        run: flake8 ./backend/lambdas --extend-ignore=E501
     

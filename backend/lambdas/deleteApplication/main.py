@@ -31,10 +31,18 @@ def lambda_handler(event, context):
             }
 
         # Suppression de l'élément dans DynamoDB
-        response = table.delete_item(
-            Key={"user_id": user_id, "job_id": job_id},
-            ConditionExpression="attribute_exists(user_id) AND attribute_exists(job_id)",
-        )
+        try:
+            table.delete_item(
+                Key={"user_id": user_id, "job_id": job_id},
+                ConditionExpression="attribute_exists(user_id) AND attribute_exists(job_id)",
+            )
+        except Exception as e:
+            print("Error deleting item:", str(e))
+            return {
+                "statusCode": 400,
+                "headers": headers,
+                "body": json.dumps({"error": "Item not found or deletion failed"}),
+            }
 
         return {
             "statusCode": 200,

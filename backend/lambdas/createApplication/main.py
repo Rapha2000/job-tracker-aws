@@ -2,7 +2,6 @@ import base64
 import json
 import boto3
 import uuid
-from decimal import Decimal
 from datetime import datetime
 
 client = boto3.client("dynamodb")
@@ -14,8 +13,6 @@ tableName = "job_applications"
 def lambda_handler(event, context):
     print(event)
     body = {}
-    statusCode = 200
-    headers = {"Content-Type": "application/json"}
 
     try:
         if event.get("isBase64Encoded", False):

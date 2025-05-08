@@ -1,9 +1,6 @@
 import base64
 import json
 import boto3
-import uuid
-from decimal import Decimal
-from datetime import datetime
 
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table("job_applications")
