@@ -33,7 +33,7 @@ jobs:
       - name: Terraform init
         run: |
           cd infra
-          terraform init -backend-config="./backend.config"
+          terraform init -backend-config="./backend.config" -backend-config="access_key="${{ secrets.AWS_ACCESS_KEY_ID }}\"" -backend-config="secret_key="${{ secrets.AWS_SECRET_ACCESS_KEY }}\""
 
       - name: Terraform Validate
         run: |
