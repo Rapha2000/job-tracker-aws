@@ -126,12 +126,14 @@ This project was created as part of a personal portfolio to demonstrate applied 
 ## 🚧 Status
 
 > Phase 0 - Initialization
+
 > Repo initialized ✅
 > Terraform minimal ✅
 > Archi schema ✅ 
 > README complete ✅
 
 > Phase 1 - Backend MVP
+
 > Lambda (endpoints CRUD --> 4/4) ✅ 
 > DynamoDB ✅
 > API Gateway REST (4/4) ✅
@@ -140,11 +142,13 @@ This project was created as part of a personal portfolio to demonstrate applied 
 > CloudWatch logs ✅
 
 > Phase 2 - CI/CD & Auth
-> GitHub Actions : déploiement Lambda/API 🔲 
+
+> GitHub Actions : déploiement Lambda/API et tests ✅ 
 > Ajout sécurité (API key ou début de Cognito) 🔲 
 > Alarmes simples 🔲 
 
 > Phase 3 - Frontend
+
 > Mini frontend React (formulaire + tableau) 🔲 
 > Hébergement sur S3 🔲 
 > Alarmes simples 🔲 
