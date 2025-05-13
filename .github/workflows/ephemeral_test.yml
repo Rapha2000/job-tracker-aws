@@ -54,6 +54,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: ${{ secrets.AWS_REGION }}
         run: |
+          cd infra
           USER_POOL_ID=$(terraform output -raw user_pool_id)
           CLIENT_ID=$(terraform output -raw cognito_client_id)
           USERNAME="testuser"
