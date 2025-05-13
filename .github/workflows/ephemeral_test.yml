@@ -75,8 +75,10 @@ jobs:
             --user-pool-id $USER_POOL_ID \
             --username $USERNAME
 
+          sleep 5
+
           # 3. Get the JWT token for the user
-          JWT_TOKEN=$(curl --location --request POST 'https://cognito-idp.$AWS_REGION.amazonaws.com/' \
+          JWT_TOKEN=$(curl --location --request POST 'https://cognito-idp.${AWS_REGION}.amazonaws.com/' \
             --header 'X-Amz-Target: AWSCognitoIdentityProviderService.InitiateAuth' \
             --header 'Content-Type: application/x-amz-json-1.1' \
             --data-raw '{
@@ -99,6 +101,14 @@ jobs:
         run: |
           chmod +x ./tests/test_endpoints.sh
           ./tests/test_endpoints.sh $(cd infra && terraform output -raw api_base_url)
+          # once tests are done, we can delete the user from the Cognito User Pool
+          cd infra
+          USER_POOL_ID=$(terraform output -raw user_pool_id)
+          USERNAME="testuser"
+          aws cognito-idp admin-delete-user \
+            --region $AWS_REGION \
+            --user-pool-id $USER_POOL_ID \
+            --username $USERNAME || echo "User might not exist"
       
       - name: Terraform destroy
         if: always() # always run this step so that if a test fails, the infra is still destroyed
