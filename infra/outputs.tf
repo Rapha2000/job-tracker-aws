@@ -40,12 +40,17 @@ output "cognito_login_url" {
   value = "https://${aws_cognito_user_pool_domain.jobtracker_domain.domain}.auth.${var.aws_region}.amazoncognito.com/login?response_type=token&client_id=${aws_cognito_user_pool_client.jobtracker_user_pool_client.id}&redirect_uri=http://localhost:3000"
 }
 
+output "user_pool_id" {
+  description = "AWS Cognito User Pool ID"
+  value       = aws_cognito_user_pool.jobtracker_user_pool.id
+}
+
 output "cognito_issuer" {
-  description = "URL issuer JWT (à utiliser dans API Gateway authorizer)"
+  description = "JWT issuer URL for Cognito"
   value = "https://${aws_cognito_user_pool_domain.jobtracker_domain.domain}.auth.${var.aws_region}.amazoncognito.com"
 }
 
 output "cognito_client_id" {
-  description = "ID du client Cognito (à mettre dans audience JWT)"
+  description = "AWS Cognito Client ID"
   value       = aws_cognito_user_pool_client.jobtracker_user_pool_client.id
 }
