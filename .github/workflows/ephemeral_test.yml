@@ -70,10 +70,13 @@ jobs:
             --user-attributes Name=email,Value="$EMAIL"
 
           # 2. For the test to work, we need to automatically confirm the user, but for real users, they would need to confirm their email
-          aws cognito-idp admin-confirm-sign-up \
-            --region $AWS_REGION \
-            --user-pool-id $USER_POOL_ID \
-            --username $USERNAME
+          curl --request POST 'https://cognito-idp.${AWS_REGION}.amazonaws.com/' \
+            --header 'X-Amz-Target: AWSCognitoIdentityProviderService.AdminConfirmSignUp' \
+            --header 'Content-Type: application/x-amz-json-1.1' \
+            --data-raw '{
+              "UserPoolId": "'$USER_POOL_ID'",
+              "Username": "'$USERNAME'"
+            }'
 
           sleep 5
 
