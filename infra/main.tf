@@ -348,6 +348,10 @@ resource "aws_apigatewayv2_route" "createApplication_lambda_route" {
 
   route_key = "POST /createApplication"
   target    = "integrations/${aws_apigatewayv2_integration.createApplication_lambda_integration.id}"
+
+  # to enable Cognito auth: attach the authorizer to the route
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito_auth.id
+  authorization_type = "JWT"
 }
 
 resource "aws_lambda_permission" "createApplication_api_gw" {
@@ -373,6 +377,10 @@ resource "aws_apigatewayv2_route" "deleteApplication_lambda_route" {
 
   route_key = "POST /deleteApplication"
   target    = "integrations/${aws_apigatewayv2_integration.deleteApplication_lambda_integration.id}"
+
+  # to enable Cognito auth: attach the authorizer to the route
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito_auth.id
+  authorization_type = "JWT"
 }
 
 resource "aws_lambda_permission" "deleteApplication_api_gw" {
@@ -398,6 +406,10 @@ resource "aws_apigatewayv2_route" "getApplications_lambda_route" {
 
   route_key = "GET /applications"
   target    = "integrations/${aws_apigatewayv2_integration.getApplications_lambda_integration.id}"
+
+  # to enable Cognito auth: attach the authorizer to the route
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito_auth.id
+  authorization_type = "JWT"
 }
 
 resource "aws_lambda_permission" "getApplications_api_gw" {
@@ -423,6 +435,10 @@ resource "aws_apigatewayv2_route" "updateApplication_lambda_route" {
 
   route_key = "PUT /updateApplication"
   target    = "integrations/${aws_apigatewayv2_integration.updateApplication_lambda_integration.id}"
+
+  # to enable Cognito auth: attach the authorizer to the route
+  authorizer_id      = aws_apigatewayv2_authorizer.cognito_auth.id
+  authorization_type = "JWT"
 }
 
 resource "aws_lambda_permission" "updateApplication_api_gw" {
@@ -434,4 +450,76 @@ resource "aws_lambda_permission" "updateApplication_api_gw" {
   source_arn = "${aws_apigatewayv2_api.job_tracker_api.execution_arn}/*/*"
 }
 
+# we know have a working API configured with no authentication. To enable authentication,
+# we will create a Cognito authorizer and attach it to the API Gateway routes
+resource "aws_apigatewayv2_authorizer" "cognito_auth" {
+  name             = "cognito-authorizer"
+  api_id           = aws_apigatewayv2_api.job_tracker_api.id
+  authorizer_type  = "JWT"
+  identity_sources = ["$request.header.Authorization"]
 
+  jwt_configuration {
+    audience = [aws_cognito_user_pool_client.jobtracker_user_pool_client.id]
+    issuer   = "https://${aws_cognito_user_pool.jobtracker_user_pool.endpoint}"
+  }
+}
+
+
+######################################################################################
+######## 4. Creating the Cognito resources used for authentication and authorization
+######################################################################################
+
+## a. Creating the user pool
+resource "aws_cognito_user_pool" "jobtracker_user_pool" {
+  name = "jobtracker-user-pool"
+
+  auto_verified_attributes = ["email"]
+
+  password_policy {
+    minimum_length    = 8
+    require_lowercase = true
+    require_numbers   = true
+    require_symbols   = false
+    require_uppercase = true
+  }
+
+  account_recovery_setting {
+    recovery_mechanism {
+      name     = "verified_email"
+      priority = 1
+    }
+  }
+
+}
+
+## b. Creating the user pool client
+resource "aws_cognito_user_pool_client" "jobtracker_user_pool_client" {
+  name         = "jobtracker-client"
+  user_pool_id = aws_cognito_user_pool.jobtracker_user_pool.id
+
+  generate_secret = false
+
+  explicit_auth_flows = [
+    "ALLOW_USER_PASSWORD_AUTH",
+    "ALLOW_REFRESH_TOKEN_AUTH",
+    "ALLOW_USER_SRP_AUTH"
+  ]
+
+  allowed_oauth_flows_user_pool_client = true
+  allowed_oauth_flows                  = ["code", "implicit"]
+  allowed_oauth_scopes                 = ["email", "openid", "profile"]
+  supported_identity_providers         = ["COGNITO"]
+
+  callback_urls = ["http://localhost:3000"]
+  logout_urls   = ["http://localhost:3000"]
+}
+
+## c. Cognito domain (Hosted UI)
+resource "aws_cognito_user_pool_domain" "jobtracker_domain" {
+  domain       = "jobtracker-${random_id.domain_suffix.hex}"
+  user_pool_id = aws_cognito_user_pool.jobtracker_user_pool.id
+}
+
+resource "random_id" "domain_suffix" {
+  byte_length = 4
+}

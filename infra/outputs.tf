@@ -35,3 +35,17 @@ output "api_base_url" {
 
   value = aws_apigatewayv2_stage.lambda_stage.invoke_url
 }
+
+output "cognito_login_url" {
+  value = "https://${aws_cognito_user_pool_domain.jobtracker_domain.domain}.auth.${var.aws_region}.amazoncognito.com/login?response_type=token&client_id=${aws_cognito_user_pool_client.jobtracker_user_pool_client.id}&redirect_uri=http://localhost:3000"
+}
+
+output "cognito_issuer" {
+  description = "URL issuer JWT (à utiliser dans API Gateway authorizer)"
+  value = "https://${aws_cognito_user_pool_domain.jobtracker_domain.domain}.auth.${var.aws_region}.amazoncognito.com"
+}
+
+output "cognito_client_id" {
+  description = "ID du client Cognito (à mettre dans audience JWT)"
+  value       = aws_cognito_user_pool_client.jobtracker_user_pool_client.id
+}
