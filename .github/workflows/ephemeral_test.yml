@@ -74,7 +74,7 @@ jobs:
             --region "$AWS_REGION" \
             --user-pool-id $USER_POOL_ID \
             --username $USERNAME \
-            --password "'$PASSWORD'" \
+            --password $PASSWORD \
             --permanent
 
           # 3. With this user created, we log in to get the JWT token
