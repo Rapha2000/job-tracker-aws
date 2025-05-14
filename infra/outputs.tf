@@ -47,7 +47,7 @@ output "user_pool_id" {
 
 output "cognito_issuer" {
   description = "JWT issuer URL for Cognito"
-  value = "https://${aws_cognito_user_pool_domain.jobtracker_domain.domain}.auth.${var.aws_region}.amazoncognito.com"
+  value       = "https://${aws_cognito_user_pool_domain.jobtracker_domain.domain}.auth.${var.aws_region}.amazoncognito.com"
 }
 
 output "cognito_client_id" {
