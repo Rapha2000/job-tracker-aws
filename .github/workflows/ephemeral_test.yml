@@ -57,24 +57,25 @@ jobs:
           cd infra
           USER_POOL_ID=$(terraform output -raw user_pool_id)
           CLIENT_ID=$(terraform output -raw cognito_client_id)
-          USERNAME="testuser"
-          PASSWORD=TestPassword123!
-          EMAIL="testuser@example.com"
+          COGNITO_TEST_USERNAME="testuser"
+          COGNITO_TEST_PASSWORD=TestPassword123!
+          COGNITO_TEST_EMAIL="testuser@example.com"
 
           # 1. We create a new user
+          export AWS_PAGER=""
           aws cognito-idp admin-create-user \
             --region "$AWS_REGION" \
             --user-pool-id $USER_POOL_ID \
-            --username $USERNAME \
-            --user-attributes Name=email,Value="$EMAIL" \
+            --username $COGNITO_TEST_USERNAME \
+            --user-attributes Name=email,Value="$COGNITO_TEST_EMAIL" \
             --message-action SUPPRESS
 
           # 2. We set the password for the user
           aws cognito-idp admin-set-user-password \
             --region "$AWS_REGION" \
             --user-pool-id $USER_POOL_ID \
-            --username $USERNAME \
-            --password $PASSWORD \
+            --username $COGNITO_TEST_USERNAME \
+            --password $COGNITO_TEST_PASSWORD \
             --permanent
 
           # 3. With this user created, we log in to get the JWT token
@@ -83,12 +84,8 @@ jobs:
             --region $AWS_REGION \
             --client-id $CLIENT_ID \
             --auth-flow USER_PASSWORD_AUTH \
-            --auth-parameters USERNAME=$USERNAME,PASSWORD=$PASSWORD \
+            --auth-parameters USERNAME=$COGNITO_TEST_USERNAME,PASSWORD=$COGNITO_TEST_PASSWORD \
             | jq -r '.AuthenticationResult.IdToken')
-          echo "Réponse Auth Cognito:"
-          echo "$AUTH_RESPONSE"
-
-          JWT_TOKEN=$(echo "$AUTH_RESPONSE" | jq -r '.AuthenticationResult.IdToken')
 
           # 4. Vérifie que le token est non vide
           if [[ -z "$JWT_TOKEN" || "$JWT_TOKEN" == "null" ]]; then
@@ -111,11 +108,11 @@ jobs:
           # once tests are done, we can delete the user from the Cognito User Pool
           cd infra
           USER_POOL_ID=$(terraform output -raw user_pool_id)
-          USERNAME="testuser"
+          COGNITO_TEST_USERNAME="testuser"
           aws cognito-idp admin-delete-user \
             --region $AWS_REGION \
             --user-pool-id $USER_POOL_ID \
-            --username $USERNAME || echo "User might not exist"
+            --username $COGNITO_TEST_USERNAME || echo "User might not exist"
       
       - name: Terraform destroy
         if: always() # always run this step so that if a test fails, the infra is still destroyed
