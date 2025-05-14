@@ -159,4 +159,5 @@ This project was created as part of a personal portfolio to demonstrate applied 
 - [https://developer.hashicorp.com/terraform/tutorials/aws/lambda-api-gateway](https://developer.hashicorp.com/terraform/tutorials/aws/lambda-api-gateway)
 - [About continuous integration with GitHub Actions](https://docs.github.com/en/actions/about-github-actions/about-continuous-integration-with-github-actions)
 - [AWS HTTP Api Gateway with Cognito and Terraform](https://andrewtarry.com/posts/aws-http-gateway-with-cognito-and-terraform/)
+- [Set up an example React single page application](https://docs.aws.amazon.com/cognito/latest/developerguide/getting-started-user-pools-application-other-options.html)
 
