@@ -78,14 +78,26 @@ jobs:
             --permanent
 
           # 3. With this user created, we log in to get the JWT token
+          echo "Tentative de login..."
           JWT_TOKEN=$(aws cognito-idp initiate-auth \
             --region $AWS_REGION \
             --client-id $CLIENT_ID \
             --auth-flow USER_PASSWORD_AUTH \
             --auth-parameters USERNAME=$USERNAME,PASSWORD=$PASSWORD \
             | jq -r '.AuthenticationResult.IdToken')
+          echo "Réponse Auth Cognito:"
+          echo "$AUTH_RESPONSE"
 
-          # 4. Export the JWT token as an environment variable
+          JWT_TOKEN=$(echo "$AUTH_RESPONSE" | jq -r '.AuthenticationResult.IdToken')
+
+          # 4. Vérifie que le token est non vide
+          if [[ -z "$JWT_TOKEN" || "$JWT_TOKEN" == "null" ]]; then
+            echo "❌ Échec de la génération du JWT token. Le login a probablement échoué."
+            exit 1
+          fi
+
+          # 5. Export the JWT token as an environment variable
+          eecho "✅ Token généré avec succès."
           echo "JWT_TOKEN=$JWT_TOKEN" >> $GITHUB_ENV
 
       - name: Test API endpoints
