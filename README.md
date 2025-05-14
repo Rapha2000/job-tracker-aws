@@ -96,9 +96,9 @@ Planned modules:
 |-----------------------|-----------------|----------------|
 | Phase 0 – Setup       | April 2025      | ✅ Done        |
 | Phase 1 – Backend MVP | May 2025        | ✅ Done        |
-| Phase 2 – CI/CD & Auth| May 2025        | 🚧 In Progress |
-| Phase 3 – Frontend    | July 2025       | ⏳ Planned     |
-| Phase 4 – Polish      | Late July 2025  | ⏳ Planned     |
+| Phase 2 – CI/CD & Auth| May 2025        | ✅ Done        |
+| Phase 3 – Frontend    | May 2025        | 🚧 In Progress |
+| Phase 4 – Polish      | June 2025       | ⏳ Planned     |
 
 ---
 
@@ -144,8 +144,8 @@ This project was created as part of a personal portfolio to demonstrate applied 
 > Phase 2 - CI/CD & Auth
 
 > GitHub Actions : déploiement Lambda/API et tests ✅ 
-> Ajout sécurité (API key ou début de Cognito) 🔲 
-> Alarmes simples 🔲 
+> Ajout sécurité (Cognito) ✅ 
+> Alarmes simples 🔲
 
 > Phase 3 - Frontend
 
