@@ -2,6 +2,28 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import mockApplications from "./mockApplications";
+import {
+  fetchApplications,
+  createApplication,
+  deleteApplication,
+  updateApplication,
+} from "./apiService";
+import { getCurrentUserEmail } from "./authUtils"; 
+
+const USE_MOCK = true;
+
+type Application = {
+  user_id: string;
+  // job_id: string;
+  company: string;
+  position: string;
+  status: string;
+  date_applied: string;
+  notes: string;
+  tags: string[];
+};
 
 function parseJwt(token) {
   const base64Url = token.split(".")[1];
@@ -40,13 +62,112 @@ const HomePage = () => {
     navigate("/login");
   };
 
+
+
+  // added
+  const [applications, setApplications] = useState<Application[]>([]);
+  const user_email = getCurrentUserEmail();
+  console.log("user_email: ", user_email);
+  const [newApp, setNewApp] = useState<Omit<Application, "job_id">>({
+    user_id: user_email,
+    company: "",
+    position: "",
+    status: "applied",
+    date_applied: new Date().toISOString().split("T")[0],
+    notes: "",
+    tags: [],
+  });
+
+  console.log("newApp: ", newApp);
+
+  // useEffect(() => {
+  //   fetchApplications(user_email)
+  //     .then(setApplications)
+  //     .catch((err) => console.error("Error fetching apps:", err));
+  // }, [user_email]);
+
+  const handleCreate = async () => {
+    try {
+      console.log("Creating application:", newApp);
+      const created = await createApplication(newApp);
+      setApplications((prev) => [...prev, created]);
+      setNewApp({ ...newApp, company: "", position: "", notes: "", tags: [] });
+    } catch (err) {
+      console.error("Error creating app:", err);
+    }
+  };
+
+  // const handleDelete = async (job_id: string) => {
+  //   try {
+  //     await deleteApplication(user_email, job_id);
+  //     setApplications((prev) => prev.filter((app) => app.job_id !== job_id));
+  //   } catch (err) {
+  //     console.error("Error deleting app:", err);
+  //   }
+  // };
+
+  // const handleUpdate = async (job_id: string, field: keyof Application, value: string) => {
+  //   try {
+  //     await updateApplication(user_email, job_id, { [field]: value });
+  //     setApplications((prev) =>
+  //       prev.map((app) =>
+  //         app.job_id === job_id ? { ...app, [field]: value } : app
+  //       )
+  //     );
+  //   } catch (err) {
+  //     console.error("Error updating app:", err);
+  //   }
+  // };
+
+
   return (
-    <div>
-      <h1>Hello World</h1>
-      <p>See console log for Amazon Cognito user tokens.</p>
+    <div className="homePage">
+      <h2>My Applications</h2>
+
+      <div className="createForm">
+        <input
+          type="text"
+          placeholder="Company"
+          value={newApp.company}
+          onChange={(e) => setNewApp({ ...newApp, company: e.target.value })}
+        />
+        <input
+          type="text"
+          placeholder="Position"
+          value={newApp.position}
+          onChange={(e) => setNewApp({ ...newApp, position: e.target.value })}
+        />
+        <input
+          type="date"
+          value={newApp.date_applied}
+          onChange={(e) => setNewApp({ ...newApp, date_applied: e.target.value })}
+        />
+        <textarea
+          placeholder="Notes"
+          value={newApp.notes}
+          onChange={(e) => setNewApp({ ...newApp, notes: e.target.value })}
+        />
+        <button onClick={handleCreate}>Add</button>
+      </div>
       <button type="button" onClick={handleLogout}>
         Logout
       </button>
+
+      {/* <ul className="appList">
+        {applications.map((app) => (
+          <li key={app.job_id}>
+            <strong>{app.company}</strong> — {app.position} ({app.status})  
+            <button onClick={() => handleDelete(app.job_id)}>🗑️</button>
+            <button
+              onClick={() =>
+                handleUpdate(app.job_id, "status", app.status === "applied" ? "interviewing" : "applied")
+              }
+            >
+              Toggle Status
+            </button>
+          </li>
+        ))}
+      </ul> */}
     </div>
   );
 };
