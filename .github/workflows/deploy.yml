@@ -43,10 +43,68 @@ jobs:
       - name: Wait for infra to be ready
         run: sleep 15
 
+      - name: Create JWT token using Cognito to be able to test the API endpoints
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        run: |
+          cd infra
+          USER_POOL_ID=$(terraform output -raw user_pool_id)
+          CLIENT_ID=$(terraform output -raw cognito_client_id)
+          COGNITO_TEST_USERNAME="testuser"
+          COGNITO_TEST_PASSWORD=TestPassword123!
+          COGNITO_TEST_EMAIL="testuser@example.com"
+
+          # 1. We create a new user
+          export AWS_PAGER=""
+          aws cognito-idp admin-create-user \
+            --region "$AWS_REGION" \
+            --user-pool-id $USER_POOL_ID \
+            --username $COGNITO_TEST_USERNAME \
+            --user-attributes Name=email,Value="$COGNITO_TEST_EMAIL" \
+            --message-action SUPPRESS
+
+          # 2. We set the password for the user
+          aws cognito-idp admin-set-user-password \
+            --region "$AWS_REGION" \
+            --user-pool-id $USER_POOL_ID \
+            --username $COGNITO_TEST_USERNAME \
+            --password $COGNITO_TEST_PASSWORD \
+            --permanent
+
+          # 3. With this user created, we log in to get the JWT token
+          echo "Tentative de login..."
+          JWT_TOKEN=$(aws cognito-idp initiate-auth \
+            --region $AWS_REGION \
+            --client-id $CLIENT_ID \
+            --auth-flow USER_PASSWORD_AUTH \
+            --auth-parameters USERNAME=$COGNITO_TEST_USERNAME,PASSWORD=$COGNITO_TEST_PASSWORD \
+            | jq -r '.AuthenticationResult.IdToken')
+
+          # 4. Vérifie que le token est non vide
+          if [[ -z "$JWT_TOKEN" || "$JWT_TOKEN" == "null" ]]; then
+            echo "❌ Échec de la génération du JWT token. Le login a probablement échoué."
+            exit 1
+          fi
+
+          # 5. Export the JWT token as an environment variable
+          echo "✅ Token généré avec succès."
+          echo "JWT_TOKEN=$JWT_TOKEN" >> $GITHUB_ENV
+
       - name: Test API endpoints
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          JWT_TOKEN: ${{ env.JWT_TOKEN }}
         run: |
           chmod +x ./tests/test_endpoints.sh
           ./tests/test_endpoints.sh $(cd infra && terraform output -raw api_base_url)
+          # once tests are done, we can delete the user from the Cognito User Pool
+          cd infra
+          USER_POOL_ID=$(terraform output -raw user_pool_id)
+          COGNITO_TEST_USERNAME="testuser"
+          aws cognito-idp admin-delete-user \
+            --region $AWS_REGION \
+            --user-pool-id $USER_POOL_ID \
+            --username $COGNITO_TEST_USERNAME || echo "User might not exist"
