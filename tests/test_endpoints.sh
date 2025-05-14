@@ -9,7 +9,7 @@ echo "Sending request to: $API_URL/createApplication"
 
 RESPONSE=$(curl --fail -s -X POST "$API_URL/createApplication" \
   -H "Content-Type: application/json" \
-  -H 'Authorizion: Bearer $JWT_TOKEN' \
+  -H 'Authorization: Bearer $JWT_TOKEN' \
   -d '{
     "user_id": "test-user",
     "company": "OpenAI",
@@ -50,7 +50,7 @@ echo "API test passed — application created successfully"
 echo "Sending request to: $API_URL/applications"
 
 RESPONSE=$(curl --fail -s -X GET "$API_URL/applications?user_id=test-user" \
-  -H 'Authorizion: Bearer $JWT_TOKEN' \
+  -H 'Authorization: Bearer $JWT_TOKEN' \
   -H "Content-Type: application/json")
 
 echo "Raw response:"
@@ -84,7 +84,7 @@ echo "Sending request to: $API_URL/updateApplication"
 
 RESPONSE=$(curl --fail -s -X PUT "$API_URL/updateApplication" \
   -H "Content-Type: application/json" \
-  -H 'Authorizion: Bearer $JWT_TOKEN' \
+  -H 'Authorization: Bearer $JWT_TOKEN' \
   -d '{
     "user_id": "test-user",
     "job_id": "'$JOB_ID'",
@@ -107,7 +107,7 @@ fi
 
 # Step 3b: verify the update by fetching the application again
 VERIFY_RESPONSE=$(curl --fail -s -X GET "$API_URL/applications?user_id=test-user" \
-  -H 'Authorizion: Bearer $JWT_TOKEN' \
+  -H 'Authorization: Bearer $JWT_TOKEN' \
   -H "Content-Type: application/json")
 
 MATCHING_APP=$(echo "$VERIFY_RESPONSE" | jq --arg job_id "$JOB_ID" '.applications[] | select(.job_id == $job_id)')
@@ -131,7 +131,7 @@ echo "Sending request to: $API_URL/deleteApplication"
 
 RESPONSE=$(curl --fail -s -X POST "$API_URL/deleteApplication" \
   -H "Content-Type: application/json" \
-  -H 'Authorizion: Bearer $JWT_TOKEN' \
+  -H 'Authorization: Bearer $JWT_TOKEN' \
   -d '{
     "user_id": "test-user",
     "job_id": "'$JOB_ID'"
