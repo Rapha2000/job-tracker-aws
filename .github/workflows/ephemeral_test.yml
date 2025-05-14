@@ -58,12 +58,12 @@ jobs:
           USER_POOL_ID=$(terraform output -raw user_pool_id)
           CLIENT_ID=$(terraform output -raw cognito_client_id)
           USERNAME="testuser"
-          PASSWORD="TestPassword123!"
+          PASSWORD=TestPassword123!
           EMAIL="testuser@example.com"
 
           # 1. We create a new user
           aws cognito-idp admin-create-user \
-            --region $AWS_REGION \
+            --region "$AWS_REGION" \
             --user-pool-id $USER_POOL_ID \
             --username $USERNAME \
             --user-attributes Name=email,Value="$EMAIL" \
@@ -71,10 +71,10 @@ jobs:
 
           # 2. We set the password for the user
           aws cognito-idp admin-set-user-password \
-            --region $AWS_REGION \
+            --region "$AWS_REGION" \
             --user-pool-id $USER_POOL_ID \
             --username $USERNAME \
-            --password "$PASSWORD" \
+            --password "'$PASSWORD'" \
             --permanent
 
           # 3. With this user created, we log in to get the JWT token
