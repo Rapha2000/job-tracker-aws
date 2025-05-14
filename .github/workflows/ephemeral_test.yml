@@ -85,7 +85,7 @@ jobs:
             --client-id $CLIENT_ID \
             --auth-flow USER_PASSWORD_AUTH \
             --auth-parameters USERNAME=$COGNITO_TEST_USERNAME,PASSWORD=$COGNITO_TEST_PASSWORD \
-            | jq -r '.AuthenticationResult.IdToken')
+            | jq -r '.AuthenticationResult.AccessToken')
 
           # 4. Vérifie que le token est non vide
           if [[ -z "$JWT_TOKEN" || "$JWT_TOKEN" == "null" ]]; then
