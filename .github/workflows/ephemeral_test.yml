@@ -94,7 +94,7 @@ jobs:
           fi
 
           # 5. Export the JWT token as an environment variable
-          eecho "✅ Token généré avec succès."
+          echo "✅ Token généré avec succès."
           echo "JWT_TOKEN=$JWT_TOKEN" >> $GITHUB_ENV
 
       - name: Test API endpoints
