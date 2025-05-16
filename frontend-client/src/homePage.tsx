@@ -80,6 +80,9 @@ const HomePage = () => {
   });
   console.log("newApp: ", newApp);
 
+  const [editAppId, setEditAppId] = useState<string | null>(null);
+  const [editFormData, setEditFormData] = useState<Partial<Application>>({});
+
   useEffect(() => {
     if (!user_email) return;
 
@@ -117,7 +120,40 @@ const HomePage = () => {
     }
   }
 
+  const handleEditClick = (app: Application) => {
+    setEditAppId(app.job_id!);
+    setEditFormData({ ...app });
+  };
 
+  const handleSaveClick = async () => {
+    if (!editAppId) return;
+
+    try {
+      const updates = {
+        company: editFormData.company!,
+        position: editFormData.position!,
+        status: editFormData.status!,
+        date_applied: editFormData.date_applied!,
+        notes: editFormData.notes!,
+        tags: editFormData.tags || [],
+      };
+      await updateApplication(user_email, editAppId, updates);
+      setApplications((prev) =>
+        prev.map((app) =>
+          app.job_id === editAppId ? { ...app, ...updates } : app
+        )
+      );
+      setEditAppId(null);
+      setEditFormData({});
+    } catch (err) {
+      console.error("Error updating app:", err);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditAppId(null);
+    setEditFormData({});
+  };
 
   return (
     <div className="homePage">
@@ -154,53 +190,89 @@ const HomePage = () => {
       </button>
 
       {/* array of applications */}
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+      <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "Arial, sans-serif", fontSize: "14px" }}>
         <thead>
-          <tr>
-            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Company</th>
-            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Position</th>
-            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Status</th>
-            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Date Applied</th>
-            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Notes</th>
-            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Tags</th>
-            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Actions</th>
+          <tr style={{ backgroundColor: "#f4f4f4" }}>
+            {["Company", "Position", "Status", "Date Applied", "Notes", "Tags", "Actions"].map((header) => (
+              <th
+                key={header}
+                style={{
+                  border: "1px solid #ddd",
+                  padding: "10px",
+                  textAlign: "left",
+                  color: "#333",
+                  fontWeight: "bold"
+                }}
+              >
+                {header}
+              </th>
+            ))}
           </tr>
         </thead>
         <tbody>
           {applications.map((app) => (
-            <tr key={app.job_id}>
-              <td style={{ border: "1px solid #ddd", padding: "8px" }}>{app.company}</td>
-              <td style={{ border: "1px solid #ddd", padding: "8px" }}>{app.position}</td>
-              <td style={{ border: "1px solid #ddd", padding: "8px" }}>{app.status}</td>
-              <td style={{ border: "1px solid #ddd", padding: "8px" }}>{app.date_applied}</td>
-              <td style={{ border: "1px solid #ddd", padding: "8px" }}>{app.notes}</td>
-              <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                {app.tags.join(", ")}
-              </td>
-              <td style={{ border: "1px solid #ddd", padding: "8px" }}>
-                <button
-                  style={{ marginRight: "8px" }}
-                  onClick={() => {
-                    /* TODO: handle edit */
-                  }}
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => {
-                    handleDelete(app.job_id);
-                  }}
-                  style={{ backgroundColor: "#e74c3c", color: "white" }}
-                >
-                  Delete
-                </button>
-              </td>
+            <tr 
+              key={app.job_id}
+              style={{ backgroundColor: "#fff", borderBottom: "1px solid #eee" }}
+              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f9f9f9"}
+              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#fff"}
+            >
+              {editAppId === app.job_id ? (
+                <>
+                  <td><input value={editFormData.company || ""} onChange={(e) => setEditFormData({ ...editFormData, company: e.target.value })} /></td>
+                  <td><input value={editFormData.position || ""} onChange={(e) => setEditFormData({ ...editFormData, position: e.target.value })} /></td>
+                  <td><input value={editFormData.status || ""} onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value })} /></td>
+                  <td><input type="date" value={editFormData.date_applied || ""} onChange={(e) => setEditFormData({ ...editFormData, date_applied: e.target.value })} /></td>
+                  <td><textarea value={editFormData.notes || ""} onChange={(e) => setEditFormData({ ...editFormData, notes: e.target.value })} /></td>
+                  <td><input value={(editFormData.tags || []).join(", ")} onChange={(e) => setEditFormData({ ...editFormData, tags: e.target.value.split(",").map(tag => tag.trim()) })} /></td>
+                  <td>
+                    <button onClick={handleSaveClick} style={{ marginRight: "6px" }}>Save</button>
+                    <button onClick={handleCancelEdit}>Cancel</button>
+                  </td>
+                </>
+              ) : (
+                <>
+                  <td>{app.company}</td>
+                  <td>{app.position}</td>
+                  <td>{app.status}</td>
+                  <td>{app.date_applied}</td>
+                  <td>{app.notes}</td>
+                  <td>{app.tags.join(", ")}</td>
+                  <td>
+                    <button
+                      onClick={() => handleEditClick(app)}
+                      style={{
+                        marginRight: "8px",
+                        backgroundColor: "#3498db",
+                        color: "white",
+                        border: "none",
+                        padding: "6px 10px",
+                        borderRadius: "4px",
+                        cursor: "pointer"
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(app.job_id!)}
+                      style={{
+                        backgroundColor: "#e74c3c",
+                        color: "white",
+                        border: "none",
+                        padding: "6px 10px",
+                        borderRadius: "4px",
+                        cursor: "pointer"
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </>
+              )}
             </tr>
           ))}
         </tbody>
       </table>
-      
-      
     </div>
   );
 };

@@ -68,7 +68,6 @@ export const fetchApplications = async (user_id : string) => {
   return data.applications;
 }
 
-
 // Update an existing application
 export const updateApplication = async (
   user_id: string,
