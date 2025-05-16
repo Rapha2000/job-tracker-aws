@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import { useNavigate } from "react-router-dom";
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import mockApplications from "./mockApplications";
 import {
   fetchApplications,
@@ -16,7 +16,7 @@ const USE_MOCK = true;
 
 type Application = {
   user_id: string;
-  // job_id: string;
+  job_id?: string;
   company: string;
   position: string;
   status: string;
@@ -62,12 +62,13 @@ const HomePage = () => {
     navigate("/login");
   };
 
-
-
+  
   // added
   const [applications, setApplications] = useState<Application[]>([]);
+  
   const user_email = getCurrentUserEmail();
   console.log("user_email: ", user_email);
+  
   const [newApp, setNewApp] = useState<Omit<Application, "job_id">>({
     user_id: user_email,
     company: "",
@@ -77,14 +78,24 @@ const HomePage = () => {
     notes: "",
     tags: [],
   });
-
   console.log("newApp: ", newApp);
 
-  // useEffect(() => {
-  //   fetchApplications(user_email)
-  //     .then(setApplications)
-  //     .catch((err) => console.error("Error fetching apps:", err));
-  // }, [user_email]);
+  useEffect(() => {
+    if (!user_email) return;
+
+    const loadApplications = async () => {
+      try {
+        const apps = await fetchApplications(user_email);
+        setApplications(apps);
+      } catch (error) {
+        console.error("Error fetching applications:", error);
+      }
+    };
+
+    loadApplications();
+  }, [user_email]);
+
+
 
   const handleCreate = async () => {
     try {
@@ -99,25 +110,14 @@ const HomePage = () => {
 
   // const handleDelete = async (job_id: string) => {
   //   try {
+  //     console.log("Deleting application:", job_id, "of user:", user_email);
   //     await deleteApplication(user_email, job_id);
   //     setApplications((prev) => prev.filter((app) => app.job_id !== job_id));
   //   } catch (err) {
   //     console.error("Error deleting app:", err);
   //   }
-  // };
+  // }
 
-  // const handleUpdate = async (job_id: string, field: keyof Application, value: string) => {
-  //   try {
-  //     await updateApplication(user_email, job_id, { [field]: value });
-  //     setApplications((prev) =>
-  //       prev.map((app) =>
-  //         app.job_id === job_id ? { ...app, [field]: value } : app
-  //       )
-  //     );
-  //   } catch (err) {
-  //     console.error("Error updating app:", err);
-  //   }
-  // };
 
 
   return (
@@ -153,21 +153,17 @@ const HomePage = () => {
         Logout
       </button>
 
-      {/* <ul className="appList">
+      {/* // Display applications */}
+      {/* Liste des applications */}
+      <ul>
         {applications.map((app) => (
           <li key={app.job_id}>
-            <strong>{app.company}</strong> — {app.position} ({app.status})  
-            <button onClick={() => handleDelete(app.job_id)}>🗑️</button>
-            <button
-              onClick={() =>
-                handleUpdate(app.job_id, "status", app.status === "applied" ? "interviewing" : "applied")
-              }
-            >
-              Toggle Status
-            </button>
+            <strong>{app.company}</strong> - {app.position} - {app.status}
           </li>
         ))}
-      </ul> */}
+      </ul>
+      
+      
     </div>
   );
 };

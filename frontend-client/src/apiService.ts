@@ -1,3 +1,4 @@
+import { use } from "react";
 import config from "./config.json"; // should contain `apiUrl`
 import { v4 as uuidv4 } from "uuid";
 
@@ -24,19 +25,6 @@ const getAuthHeaders = () => {
   };
 };
 
-// Fetch applications for a specific user
-export const fetchApplications = async (userId: string): Promise<Application[]> => {
-  const res = await fetch(
-    `${config.apiUrl}/applications?user_id=${encodeURIComponent(userId)}`,
-    {
-      method: "GET",
-      headers: getAuthHeaders(),
-    }
-  );
-  if (!res.ok) throw new Error("Failed to fetch applications");
-  return res.json();
-};
-
 // Create a new application for a specific user
 export const createApplication = async (app: Application) => {
 
@@ -47,8 +35,37 @@ export const createApplication = async (app: Application) => {
   });
 
   if (!res.ok) throw new Error("Failed to create application");
-  return app;
+  
+  const data = await res.json();
+  return data.application;
 };
+
+// Delete an existing application
+export const deleteApplication = async (user_id: string, job_id: string) => {
+
+  const res = await fetch(`${config.apiUrl}/deleteApplication`, {
+    method: "POST",
+    headers: getAuthHeaders(),
+    body: JSON.stringify({ user_id, job_id }),
+  });
+}
+
+// Get the list of applications for a specific user (queryString)
+export const fetchApplications = async (user_id : string) => {
+  
+  const res = await fetch(
+    `${config.apiUrl}/applications?user_id=${encodeURIComponent(user_id)}`,
+    {
+      method: "GET",
+      headers: getAuthHeaders(),
+    }
+  );
+  if (!res.ok) throw new Error("Failed to fetch applications");
+
+  const data = await res.json();
+  return data.applications;
+}
+
 
 // Update an existing application
 export const updateApplication = async (
@@ -68,12 +85,12 @@ export const updateApplication = async (
 };
 
 // Delete an application
-export const deleteApplication = async (user_id: string, job_id: string) => {
-  const res = await fetch(`${config.apiUrl}/deleteApplication`, {
-    method: "POST",
-    headers: getAuthHeaders(),
-    body: JSON.stringify({ user_id, job_id }),
-  });
+// export const deleteApplication = async (user_id: string, job_id: string) => {
+//   const res = await fetch(`${config.apiUrl}/deleteApplication`, {
+//     method: "POST",
+//     headers: getAuthHeaders(),
+//     body: JSON.stringify({ user_id, job_id }),
+//   });
 
-  if (!res.ok) throw new Error("Failed to delete application");
-};
+//   if (!res.ok) throw new Error("Failed to delete application");
+// };
