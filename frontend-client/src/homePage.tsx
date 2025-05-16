@@ -124,6 +124,7 @@ const HomePage = () => {
     <div className="homePage">
       <h2>My Applications</h2>
 
+      {/* Form to create a new application */}
       <div className="createForm">
         <input
           type="text"
@@ -153,15 +154,52 @@ const HomePage = () => {
         Logout
       </button>
 
-      {/* // Display applications */}
-      {/* Liste des applications */}
-      <ul>
-        {applications.map((app) => (
-          <li key={app.job_id}>
-            <strong>{app.company}</strong> - {app.position} - {app.status}
-          </li>
-        ))}
-      </ul>
+      {/* array of applications */}
+      <table style={{ width: "100%", borderCollapse: "collapse" }}>
+        <thead>
+          <tr>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Company</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Position</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Status</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Date Applied</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Notes</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Tags</th>
+            <th style={{ border: "1px solid #ddd", padding: "8px" }}>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {applications.map((app) => (
+            <tr key={app.job_id}>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>{app.company}</td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>{app.position}</td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>{app.status}</td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>{app.date_applied}</td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>{app.notes}</td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                {app.tags.join(", ")}
+              </td>
+              <td style={{ border: "1px solid #ddd", padding: "8px" }}>
+                <button
+                  style={{ marginRight: "8px" }}
+                  onClick={() => {
+                    /* TODO: handle edit */
+                  }}
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => {
+                    /* TODO: handle delete */
+                  }}
+                  style={{ backgroundColor: "#e74c3c", color: "white" }}
+                >
+                  Delete
+                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
       
       
     </div>
