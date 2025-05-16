@@ -96,7 +96,6 @@ const HomePage = () => {
   }, [user_email]);
 
 
-
   const handleCreate = async () => {
     try {
       console.log("Creating application:", newApp);
@@ -108,15 +107,15 @@ const HomePage = () => {
     }
   };
 
-  // const handleDelete = async (job_id: string) => {
-  //   try {
-  //     console.log("Deleting application:", job_id, "of user:", user_email);
-  //     await deleteApplication(user_email, job_id);
-  //     setApplications((prev) => prev.filter((app) => app.job_id !== job_id));
-  //   } catch (err) {
-  //     console.error("Error deleting app:", err);
-  //   }
-  // }
+  const handleDelete = async (job_id: string) => {
+    try {
+      console.log("Deleting application:", job_id, "of user:", user_email);
+      await deleteApplication(user_email, job_id);
+      setApplications((prev) => prev.filter((app) => app.job_id !== job_id));
+    } catch (err) {
+      console.error("Error deleting app:", err);
+    }
+  }
 
 
 
@@ -189,7 +188,7 @@ const HomePage = () => {
                 </button>
                 <button
                   onClick={() => {
-                    /* TODO: handle delete */
+                    handleDelete(app.job_id);
                   }}
                   style={{ backgroundColor: "#e74c3c", color: "white" }}
                 >

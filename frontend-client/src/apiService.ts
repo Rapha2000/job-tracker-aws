@@ -35,7 +35,7 @@ export const createApplication = async (app: Application) => {
   });
 
   if (!res.ok) throw new Error("Failed to create application");
-  
+
   const data = await res.json();
   return data.application;
 };
@@ -48,6 +48,8 @@ export const deleteApplication = async (user_id: string, job_id: string) => {
     headers: getAuthHeaders(),
     body: JSON.stringify({ user_id, job_id }),
   });
+
+  if (!res.ok) throw new Error("Failed to delete application");
 }
 
 // Get the list of applications for a specific user (queryString)
@@ -83,14 +85,3 @@ export const updateApplication = async (
 
   if (!res.ok) throw new Error("Failed to update application");
 };
-
-// Delete an application
-// export const deleteApplication = async (user_id: string, job_id: string) => {
-//   const res = await fetch(`${config.apiUrl}/deleteApplication`, {
-//     method: "POST",
-//     headers: getAuthHeaders(),
-//     body: JSON.stringify({ user_id, job_id }),
-//   });
-
-//   if (!res.ok) throw new Error("Failed to delete application");
-// };
