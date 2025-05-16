@@ -8,8 +8,8 @@ resource "aws_apigatewayv2_api" "job_tracker_api" {
   cors_configuration {
     allow_credentials = false
     allow_headers     = ["Content-Type", "Authorization"]
-    allow_methods = ["OPTIONS", "GET", "POST", "PUT", "DELETE"]
-    allow_origins = ["*"]
+    allow_methods     = ["OPTIONS", "GET", "POST", "PUT", "DELETE"]
+    allow_origins     = ["*"]
     expose_headers    = []
     max_age           = 3600
   }

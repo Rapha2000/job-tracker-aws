@@ -6,6 +6,6 @@ variable "aws_region" {
 }
 
 variable "dynamodb_access_policy_arn" {
-  type = string
+  type        = string
   description = "aws IAM policy ARN for the DynamoDB access"
 }
