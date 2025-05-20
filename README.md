@@ -160,4 +160,5 @@ This project was created as part of a personal portfolio to demonstrate applied 
 - [About continuous integration with GitHub Actions](https://docs.github.com/en/actions/about-github-actions/about-continuous-integration-with-github-actions)
 - [AWS HTTP Api Gateway with Cognito and Terraform](https://andrewtarry.com/posts/aws-http-gateway-with-cognito-and-terraform/)
 - [Set up an example React single page application](https://docs.aws.amazon.com/cognito/latest/developerguide/getting-started-user-pools-application-other-options.html)
+- [CloudFront custom error responses](https://medium.com/@codenova/deploy-a-react-application-on-aws-with-cloudfront-and-s3-6e65333d4610)
 
