@@ -1,5 +1,5 @@
 import { use } from "react";
-import config from "./config.json"; // should contain `apiUrl`
+// import config from "./config.json"; // should contain `apiUrl`
 import { v4 as uuidv4 } from "uuid";
 
 type Application = {
@@ -12,6 +12,7 @@ type Application = {
   notes: string;
   tags: string[];
 };
+
 
 const getAuthHeaders = () => {
   const idToken = sessionStorage.idToken.toString()
@@ -28,7 +29,9 @@ const getAuthHeaders = () => {
 // Create a new application for a specific user
 export const createApplication = async (app: Application) => {
 
-  const res = await fetch(`${config.apiUrl}/createApplication`, {
+  const apiUrl = import.meta.env.VITE_API_URL
+  
+  const res = await fetch(`${apiUrl}/createApplication`, {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify(app),
@@ -43,7 +46,9 @@ export const createApplication = async (app: Application) => {
 // Delete an existing application
 export const deleteApplication = async (user_id: string, job_id: string) => {
 
-  const res = await fetch(`${config.apiUrl}/deleteApplication`, {
+  const apiUrl = import.meta.env.VITE_API_URL
+
+  const res = await fetch(`${apiUrl}/deleteApplication`, {
     method: "POST",
     headers: getAuthHeaders(),
     body: JSON.stringify({ user_id, job_id }),
@@ -55,8 +60,10 @@ export const deleteApplication = async (user_id: string, job_id: string) => {
 // Get the list of applications for a specific user (queryString)
 export const fetchApplications = async (user_id : string) => {
   
+  const apiUrl = import.meta.env.VITE_API_URL
+  
   const res = await fetch(
-    `${config.apiUrl}/applications?user_id=${encodeURIComponent(user_id)}`,
+    `${apiUrl}/applications?user_id=${encodeURIComponent(user_id)}`,
     {
       method: "GET",
       headers: getAuthHeaders(),
@@ -76,7 +83,9 @@ export const updateApplication = async (
 ) => {
   const payload = { user_id, job_id, ...updates };
 
-  const res = await fetch(`${config.apiUrl}/updateApplication`, {
+  const apiUrl = import.meta.env.VITE_API_URL
+
+  const res = await fetch(`${apiUrl}/updateApplication`, {
     method: "PUT",
     headers: getAuthHeaders(),
     body: JSON.stringify(payload),

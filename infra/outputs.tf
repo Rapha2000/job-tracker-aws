@@ -22,3 +22,13 @@ output "cognito_client_id" {
   description = "AWS Cognito Client ID"
   value       = module.backend.cognito_client_id
 }
+
+output "job_tracker_website_bucket_url" {
+  description = "URL of the S3 bucket hosting the React frontend."
+  value       = module.frontend.job_tracker_website_bucket_url
+}
+
+output "cloudfront_distribution_domain" {
+  description = "CloudFront distribution domain name."
+  value       = module.frontend.cloudfront_distribution_domain
+}

@@ -10,16 +10,25 @@ import {
   type SignUpCommandInput,
   type ConfirmSignUpCommandInput,
 } from "@aws-sdk/client-cognito-identity-provider";
-import config from "./config.json";
+// import config from "./config.json";
+
+const aws_region = import.meta.env.VITE_REGION;
+
+console.log("REGION: ", import.meta.env.VITE_REGION);
+console.log("API URL: ", import.meta.env.VITE_API_URL);
+
 
 export const cognitoClient = new CognitoIdentityProviderClient({
-  region: config.region,
+  region: aws_region,
 });
 
 export const signIn = async (username: string, password: string) => {
+
+  const cognito_user_pool_client_id = import.meta.env.VITE_CLIENT_ID;
+
   const params: InitiateAuthCommandInput = {
     AuthFlow: "USER_PASSWORD_AUTH",
-    ClientId: config.clientId,
+    ClientId: cognito_user_pool_client_id,
     AuthParameters: {
       USERNAME: username,
       PASSWORD: password,
@@ -47,8 +56,11 @@ export const signIn = async (username: string, password: string) => {
 };
 
 export const signUp = async (email: string, password: string) => {
+
+  const cognito_user_pool_client_id = import.meta.env.VITE_CLIENT_ID;
+
   const params: SignUpCommandInput = {
-    ClientId: config.clientId,
+    ClientId: cognito_user_pool_client_id,
     Username: email,
     Password: password,
     UserAttributes: [
@@ -70,8 +82,11 @@ export const signUp = async (email: string, password: string) => {
 };
 
 export const confirmSignUp = async (username: string, code: string) => {
+
+  const cognito_user_pool_client_id = import.meta.env.VITE_CLIENT_ID;
+
   const params: ConfirmSignUpCommandInput = {
-    ClientId: config.clientId,
+    ClientId: cognito_user_pool_client_id,
     Username: username,
     ConfirmationCode: code,
   };
