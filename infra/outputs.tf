@@ -32,3 +32,9 @@ output "cloudfront_distribution_domain" {
   description = "CloudFront distribution domain name."
   value       = module.frontend.cloudfront_distribution_domain
 }
+
+output "aws_region" {
+  description = "AWS region"
+  value       = var.aws_region
+}
+
