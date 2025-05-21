@@ -6,19 +6,19 @@
 
 ## 🚀 Project Overview
 
-This project simulates a real-world, production-grade cloud-native application with a clear technical and functional scope. It was built to showcase cloud solution design, Infrastructure as Code (IaC), and modern CI/CD practices, while also solving a personal need: managing job applications efficiently.
+This project simulates a real-world, production-grade cloud-native application with a clear technical and functional scope. It was built to showcase cloud solution design, Infrastructure as Code (IaC), and CI/CD practices, while also solving a personal need: managing job applications efficiently.
 
 ---
 
 ## 📌 Key Features
 
 - REST API for job application tracking (CRUD)
-- Serverless backend using AWS Lambda + API Gateway
+- Serverless backend with AWS Lambda and API Gateway
 - Data stored in DynamoDB (NoSQL)
-- Secure endpoints (API key or Cognito-based auth)
-- Infrastructure managed via Terraform
-- CI/CD with GitHub Actions
-- Logging and monitoring with CloudWatch
+- Secure endpoints via Cognito authentication
+- Infrastructure managed using Terraform
+- CI/CD pipelines with GitHub Actions
+- Logging and monitoring through CloudWatch
 
 ---
 
@@ -26,14 +26,14 @@ This project simulates a real-world, production-grade cloud-native application w
 
 | Layer            | Technology        |
 |------------------|-------------------|
-| Backend          | AWS Lambda (Python), API Gateway |
-| Database         | DynamoDB          |
-| Authentication   | Cognito at the end (but simple API key for MVP) |
-| Infrastructure   | Terraform         |
-| CI/CD            | GitHub Actions    |
-| Monitoring       | CloudWatch Logs & Alarms |
-| Frontend         | React + S3 + CloudFront |
-| Bonus Features   | AWS SES, S3 file upload |
+| Backend          | Lambda (Python), API Gateway |
+| Database         | DynamoDB                     |
+| Authentication   | Cognito                      |
+| Infrastructure   | Terraform                    |
+| CI/CD            | GitHub Actions               |
+| Monitoring       | CloudWatch Logs & Alarms     |
+| Frontend         | React + S3 + CloudFront      |
+| Bonus Features   | AI workflow integrations     |
 
 ---
 
@@ -44,27 +44,26 @@ A basic version includes:
 
 [User] --> [API Gateway] --> [Lambda Functions] --> [DynamoDB]
 
-More advanced components will include:
+Additional components:
 
-- Cognito for user authentication
-- GitHub Actions pipeline for CI/CD
-- CloudWatch alarms and dashboards
-- S3 static frontend hosting
-
-Detailed architecture diagrams are available in the `/diagrams` folder.
+- AWS Cognito for user authentication
+- GitHub Actions for CI/CD
+- CloudWatch for monitoring and alarms
+- Static frontend hosted on S3 and served through CloudFront
+- Detailed architecture diagrams are available in the /diagrams folder.
 
 ---
 
 ## 🛠️ Getting Started
 
-> This project is currently in early development. The infrastructure setup and initial API endpoints will be released soon.
+> This project is currently under development.
 
 Planned modules:
 
 1. **Infrastructure setup**: Terraform configuration for AWS resources
 2. **API implementation**: Python-based Lambda functions for job application CRUD
 3. **CI/CD integration**: Automated deployment pipelines with GitHub Actions
-4. **Authentication**: Cognito user pool setup or basic API key usage
+4. **Authentication**: Cognito user pool setup
 5. **Frontend / Demo**: static React frontend
 
 ---
@@ -97,14 +96,14 @@ Planned modules:
 | Phase 0 – Setup       | April 2025      | ✅ Done        |
 | Phase 1 – Backend MVP | May 2025        | ✅ Done        |
 | Phase 2 – CI/CD & Auth| May 2025        | ✅ Done        |
-| Phase 3 – Frontend    | May 2025        | 🚧 In Progress |
-| Phase 4 – Polish      | June 2025       | ⏳ Planned     |
+| Phase 3 – Frontend    | May 2025        | ✅ Done        |
+| Phase 4 – Polish      | June 2025       | 🚧 In Progress |
 
 ---
 
 ## 🙋‍♂️ Author
 
-**Raphael** – Cloud/DevOps enthusiast with a generalist engineering background.  
+**Raphael** – Cloud/DevOps/AI enthusiast with a generalist engineering background.  
 Interested in solution architecture, cloud-native design, and scalable applications.  
 This project was created as part of a personal portfolio to demonstrate applied cloud knowledge.
 
@@ -112,8 +111,10 @@ This project was created as part of a personal portfolio to demonstrate applied 
 ## 🔧 Tech Stack
 
 - AWS Lambda (Python)
-- API Gateway
-- DynamoDB
+- AWS API Gateway
+- AWS DynamoDB
+- AWS Cognito
+- Static Website Hosting using AWS S3 & CloudFront
 - Terraform (IaC)
 - GitHub Actions (CI/CD)
 
@@ -129,29 +130,29 @@ This project was created as part of a personal portfolio to demonstrate applied 
 
 > Repo initialized ✅
 > Terraform minimal ✅
-> Archi schema ✅ 
-> README complete ✅
+> Architecture schema completed ✅ 
+> README completed ✅
 
 > Phase 1 - Backend MVP
 
-> Lambda (endpoints CRUD --> 4/4) ✅ 
-> DynamoDB ✅
-> API Gateway REST (4/4) ✅
+> Lambda endpoints (CRUD, 4/4) ✅ 
+> DynamoDB setup ✅
+> API Gateway REST (4/4 endpoints) ✅
 > Curl tests (4/4) ✅ 
-> Complete terraform deployment ✅
+> Full Terraform deployment ✅
 > CloudWatch logs ✅
 
 > Phase 2 - CI/CD & Auth
 
-> GitHub Actions : déploiement Lambda/API et tests ✅ 
-> Ajout sécurité (Cognito) ✅ 
-> Alarmes simples 🔲
+> GitHub Actions: Lambda/API deployment and tests ✅ 
+> Added security with Cognito ✅ 
+> Basic CloudWatch alarms 🔲
 
 > Phase 3 - Frontend
 
-> Mini frontend React (formulaire + tableau) 🔲 
-> Hébergement sur S3 🔲 
-> Alarmes simples 🔲 
+> Minimal React frontend (form + table) ✅  
+> Static website deployed on S3 + CloudFront ✅ 
+> Basic CloudWatch alarms 🔲 
 
 ## Resources
 
