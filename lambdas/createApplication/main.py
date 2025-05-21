@@ -9,6 +9,7 @@ dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table("job_applications")
 tableName = "job_applications"
 
+
 def lambda_handler(event, context):
     print(event)
     body = {}
