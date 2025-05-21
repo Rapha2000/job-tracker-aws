@@ -42,8 +42,8 @@ resource "aws_s3_bucket_public_access_block" "lambdas_bucket" {
 data "archive_file" "lambda_create" {
   type = "zip"
 
-  source_dir  = "${path.module}/../../../../backend/lambdas/createApplication/"
-  output_path = "${path.module}/../../../../backend/lambdas/createApplication/createApplication.zip"
+  source_dir  = "${path.module}/../../../../lambdas/createApplication/"
+  output_path = "${path.module}/../../../../lambdas/createApplication/createApplication.zip"
 }
 
 resource "aws_s3_object" "lambda_create" {
@@ -61,8 +61,8 @@ resource "aws_s3_object" "lambda_create" {
 data "archive_file" "lambda_delete" {
   type = "zip"
 
-  source_dir  = "${path.module}/../../../../backend/lambdas/deleteApplication/"
-  output_path = "${path.module}/../../../../backend/lambdas/deleteApplication/deleteApplication.zip"
+  source_dir  = "${path.module}/../../../../lambdas/deleteApplication/"
+  output_path = "${path.module}/../../../../lambdas/deleteApplication/deleteApplication.zip"
 }
 
 resource "aws_s3_object" "lambda_delete" {
@@ -80,8 +80,8 @@ resource "aws_s3_object" "lambda_delete" {
 data "archive_file" "lambda_get" {
   type = "zip"
 
-  source_dir  = "${path.module}/../../../../backend/lambdas/getApplications/"
-  output_path = "${path.module}/../../../../backend/lambdas/getApplications/getApplications.zip"
+  source_dir  = "${path.module}/../../../../lambdas/getApplications/"
+  output_path = "${path.module}/../../../../lambdas/getApplications/getApplications.zip"
 }
 
 resource "aws_s3_object" "lambda_get" {
@@ -99,8 +99,8 @@ resource "aws_s3_object" "lambda_get" {
 data "archive_file" "lambda_update" {
   type = "zip"
 
-  source_dir  = "${path.module}/../../../../backend/lambdas/updateApplication/"
-  output_path = "${path.module}/../../../../backend/lambdas/updateApplication/updateApplication.zip"
+  source_dir  = "${path.module}/../../../../lambdas/updateApplication/"
+  output_path = "${path.module}/../../../../lambdas/updateApplication/updateApplication.zip"
 }
 
 resource "aws_s3_object" "lambda_update" {
