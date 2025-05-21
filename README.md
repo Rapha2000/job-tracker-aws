@@ -1,3 +1,7 @@
+[![CI (Terraform + Lambdas Python + React build)](https://github.com/Rapha2000/job-tracker-aws/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Rapha2000/job-tracker-aws/actions/workflows/ci.yml)
+
+[![CD (Deploy to AWS)](https://github.com/Rapha2000/job-tracker-aws/actions/workflows/cd.yml/badge.svg?branch=main)](https://github.com/Rapha2000/job-tracker-aws/actions/workflows/cd.yml)
+
 # JobTracker AWS
 
 ☁️ JobTracker AWS is a personal cloud-native project designed to track job applications through a lightweight and scalable web application. The goal is to demonstrate practical experience in modern cloud architecture and DevOps best practices using AWS serverless technologies.
