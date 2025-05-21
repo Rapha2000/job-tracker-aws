@@ -48,9 +48,9 @@ resource "aws_s3_object" "static_site_upload_object" {
     regex("\\.[^.]+$", each.value), // ou fileext(each.value) si dispo dans ton Terraform
     "application/octet-stream"
   )
-  depends_on = [ 
+  depends_on = [
     aws_s3_bucket.job-tracker-website-bucket,
     aws_s3_bucket_website_configuration.job-tracker-website-bucket-configuration,
     aws_s3_bucket_public_access_block.job-tracker-website-bucket-public-access-block,
-   ]
+  ]
 }

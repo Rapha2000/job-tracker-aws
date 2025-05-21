@@ -4,11 +4,11 @@
 
 # CloudFront Origin Access Control
 resource "aws_cloudfront_origin_access_control" "cloudfront_oac" {
-    name                              = "example-oac"
-    description                       = "Example Origin Access Control for S3"
-    origin_access_control_origin_type = "s3"
-    signing_behavior                  = "always"
-    signing_protocol                  = "sigv4"
+  name                              = "example-oac"
+  description                       = "Example Origin Access Control for S3"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
 }
 
 # data "aws_iam_policy_document" "job-tracker-website-cloudfront-origin-access-identity-policy" {
@@ -46,7 +46,7 @@ resource "aws_s3_bucket_policy" "job-tracker-website-bucket-policy" {
 }
 
 resource "aws_cloudfront_distribution" "job-tracker-website-cloudfront-distribution" {
-  enabled             = true
+  enabled = true
 
   origin {
     domain_name              = var.job-tracker-website-bucket-regional-domain-name

@@ -15,14 +15,14 @@ module "backend" {
 }
 
 module "frontend" {
-  source = "./frontend"
-  aws_region = var.aws_region
-  cognito_user_pool_id = module.backend.user_pool_id
+  source                      = "./frontend"
+  aws_region                  = var.aws_region
+  cognito_user_pool_id        = module.backend.user_pool_id
   cognito_user_pool_client_id = module.backend.cognito_client_id
-  api_base_url = module.backend.api_base_url
-  frontend_source_directory = "${path.module}/../frontend-client"
-  
-  depends_on = [ module.backend ]
+  api_base_url                = module.backend.api_base_url
+  frontend_source_directory   = "${path.module}/../frontend-client"
+
+  depends_on = [module.backend]
 }
 
 
