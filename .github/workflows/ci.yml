@@ -1,10 +1,10 @@
-name: CI
+name: CI (Terraform + Lambdas Python + React build)
 
 on:
   push:
     branches: [main, dev]
   pull_request:
-    branches: [main]
+    branches: [main, dev]
 
 jobs:
   # 1st job: Validate the Terraform code
@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set Up Terraform     # set up the terraform environment
-        uses:  hashicorp/setup-terraform@v3
+        uses: hashicorp/setup-terraform@v3
 
       - name: Create backend.config file  # this file is used to configure the remote backend for terraform
         run: |
@@ -24,7 +24,7 @@ jobs:
           echo "bucket = \"${{ secrets.AWS_TF_STATE_BUCKET_NAME }}\"" > backend.config 
           echo "key = \"${{ secrets.AWS_TF_STATE_S3_KEY }}\"" >> backend.config
           echo "region = \"${{ secrets.AWS_REGION }}\"" >> backend.config
-        # these values need to be set in the repository secrets
+        # these values need to be set in the Github repository secrets
 
       - name: Terraform format check
         run: |
@@ -66,4 +66,25 @@ jobs:
 
       - name: Run flake8 (linting)
         run: flake8 ./lambdas --extend-ignore=E501
+
+  # 3rd job: Build the React app
+  react-build:
+    name: Build React App
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set Up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        working-directory: ./frontend-client
+        run: npm install
+
+      - name: Build the app
+        working-directory: ./frontend-client
+        run: npm run build
     
