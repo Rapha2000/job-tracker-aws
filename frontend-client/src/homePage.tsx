@@ -3,7 +3,6 @@
 
 import { useNavigate } from "react-router-dom";
 import React, { use, useEffect, useState } from "react";
-import mockApplications from "./mockApplications";
 import {
   fetchApplications,
   createApplication,
@@ -42,32 +41,30 @@ const HomePage = () => {
   const navigate = useNavigate();
   const idToken = parseJwt(sessionStorage.idToken.toString());
   const accessToken = parseJwt(sessionStorage.accessToken.toString());
-  console.log(
-    `Amazon Cognito ID token encoded: ${sessionStorage.idToken.toString()}`,
-  );
-  console.log("Amazon Cognito ID token decoded: ");
-  console.log(idToken);
-  console.log(
-    `Amazon Cognito access token encoded: ${sessionStorage.accessToken.toString()}`,
-  );
-  console.log("Amazon Cognito access token decoded: ");
-  console.log(accessToken);
-  console.log("Amazon Cognito refresh token: ");
-  console.log(sessionStorage.refreshToken);
-  console.log(
-    "Amazon Cognito example application. Not for use in production applications.",
-  );
+  // console.log(
+  //   `Amazon Cognito ID token encoded: ${sessionStorage.idToken.toString()}`,
+  // );
+  // console.log("Amazon Cognito ID token decoded: ");
+  // console.log(idToken);
+  // console.log(
+  //   `Amazon Cognito access token encoded: ${sessionStorage.accessToken.toString()}`,
+  // );
+  // console.log("Amazon Cognito access token decoded: ");
+  // console.log(accessToken);
+  // console.log("Amazon Cognito refresh token: ");
+  // console.log(sessionStorage.refreshToken);
+  // console.log(
+  //   "Amazon Cognito example application. Not for use in production applications.",
+  // );
   const handleLogout = () => {
     sessionStorage.clear();
     navigate("/login");
   };
 
   
-  // added
   const [applications, setApplications] = useState<Application[]>([]);
   
   const user_email = getCurrentUserEmail();
-  console.log("user_email: ", user_email);
   
   const [newApp, setNewApp] = useState<Omit<Application, "job_id">>({
     user_id: user_email,
@@ -78,7 +75,6 @@ const HomePage = () => {
     notes: "",
     tags: [],
   });
-  console.log("newApp: ", newApp);
 
   const [editAppId, setEditAppId] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<Application>>({});
@@ -101,7 +97,6 @@ const HomePage = () => {
 
   const handleCreate = async () => {
     try {
-      console.log("Creating application:", newApp);
       const created = await createApplication(newApp);
       setApplications((prev) => [...prev, created]);
       setNewApp({ ...newApp, company: "", position: "", notes: "", tags: [] });
@@ -112,7 +107,6 @@ const HomePage = () => {
 
   const handleDelete = async (job_id: string) => {
     try {
-      console.log("Deleting application:", job_id, "of user:", user_email);
       await deleteApplication(user_email, job_id);
       setApplications((prev) => prev.filter((app) => app.job_id !== job_id));
     } catch (err) {

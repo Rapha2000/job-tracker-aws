@@ -82,7 +82,7 @@ jobs:
             --auth-parameters USERNAME=$COGNITO_TEST_USERNAME,PASSWORD=$COGNITO_TEST_PASSWORD \
             | jq -r '.AuthenticationResult.IdToken')
 
-          # 4. Vérifie que le token est non vide
+          # 4. Check if the JWT token is empty or null
           if [[ -z "$JWT_TOKEN" || "$JWT_TOKEN" == "null" ]]; then
             echo "[ERROR] Échec de la génération du JWT token. Le login a probablement échoué."
             exit 1

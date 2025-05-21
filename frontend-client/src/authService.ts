@@ -10,13 +10,8 @@ import {
   type SignUpCommandInput,
   type ConfirmSignUpCommandInput,
 } from "@aws-sdk/client-cognito-identity-provider";
-// import config from "./config.json";
 
 const aws_region = import.meta.env.VITE_REGION;
-
-console.log("REGION: ", import.meta.env.VITE_REGION);
-console.log("API URL: ", import.meta.env.VITE_API_URL);
-
 
 export const cognitoClient = new CognitoIdentityProviderClient({
   region: aws_region,

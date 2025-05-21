@@ -15,7 +15,6 @@ def lambda_handler(event, context):
         else:
             decoded_body = event.get("body", "")
 
-        print("Decoded body:", decoded_body)
         body = json.loads(decoded_body)
 
         job_id = body.get("job_id")
@@ -28,7 +27,7 @@ def lambda_handler(event, context):
                 "body": json.dumps({"error": "Missing user_id or job_id"}),
             }
 
-        # Construction de l'expression de mise à jour
+        # Building the update expression
         update_fields = [
             "company",
             "position",
@@ -57,7 +56,7 @@ def lambda_handler(event, context):
                 "body": json.dumps({"error": "No updatable fields provided"}),
             }
 
-        # Exécution de la mise à jour
+        # perform the update
         table.update_item(
             Key={"user_id": user_id, "job_id": job_id},
             UpdateExpression="SET " + ", ".join(expression_parts),

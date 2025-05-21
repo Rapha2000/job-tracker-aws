@@ -6,7 +6,7 @@ DIST_DIR := $(FRONTEND_DIR)/dist
 # Step 1: Initialize and apply Terraform backend and frontend modules
 .PHONY: apply
 apply:
-	@echo "🚧 Running full terraform apply..."
+	@echo "Running terraform apply..."
 	terraform apply -auto-approve
 
 # Step 2: Generate .env from Terraform outputs
@@ -16,7 +16,7 @@ apply:
 	@echo "VITE_API_URL=$$(terraform output -raw api_base_url)" >> $(ENV_FILE)
 	@echo "VITE_REGION=$$(terraform output -raw aws_region)" >> $(ENV_FILE)
 
-# Step 3: Build React app
+# Step 3: Build the React app
 build: .env
 	@echo "Building React frontend..."
 	cd $(FRONTEND_DIR) && npm install && npm run build
@@ -32,5 +32,5 @@ deploy: frontend
 
 # Clean local build and .env
 clean:
-	@echo "🧹 Cleaning build artifacts..."
+	@echo "Cleaning build artifacts..."
 	rm -rf $(DIST_DIR) $(ENV_FILE)

@@ -7,17 +7,14 @@ table = dynamodb.Table("job_applications")
 
 
 def lambda_handler(event, context):
-    print(event)
     headers = {"Content-Type": "application/json"}
 
     try:
-        # Décodage du body si nécessaire
         if event.get("isBase64Encoded", False):
             decoded_body = base64.b64decode(event.get("body", "")).decode("utf-8")
         else:
             decoded_body = event.get("body", "")
 
-        print("Decoded body:", decoded_body)
         body = json.loads(decoded_body)
 
         user_id = body.get("user_id")
@@ -30,7 +27,6 @@ def lambda_handler(event, context):
                 "body": json.dumps({"error": "Missing user_id or job_id"}),
             }
 
-        # Suppression de l'élément dans DynamoDB
         try:
             table.delete_item(
                 Key={"user_id": user_id, "job_id": job_id},

@@ -41,9 +41,7 @@ resource "aws_s3_object" "static_site_upload_object" {
       ".html" = "text/html"
       ".css"  = "text/css"
       ".js"   = "application/javascript"
-      ".png"  = "image/png"
-      ".jpg"  = "image/jpeg"
-      ".gif"  = "image/gif"
+      "svg"  = "image/svg+xml"
     },
     regex("\\.[^.]+$", each.value), // ou fileext(each.value) si dispo dans ton Terraform
     "application/octet-stream"

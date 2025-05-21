@@ -9,7 +9,6 @@ dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table("job_applications")
 tableName = "job_applications"
 
-
 def lambda_handler(event, context):
     print(event)
     body = {}
@@ -20,10 +19,8 @@ def lambda_handler(event, context):
         else:
             decoded_body = event.get("body", "")
 
-        print("Decoded body:", decoded_body)
         body = json.loads(decoded_body)
 
-        print("Parsed body:", body)
         user_id = body.get("user_id")
         if not user_id:
             return {"statusCode": 400, "body": json.dumps({"error": "Missing user_id"})}

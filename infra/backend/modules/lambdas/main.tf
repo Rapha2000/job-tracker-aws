@@ -1,5 +1,5 @@
 ############################################################################################################################
-######## 2.a. Creating the bucket and associated policies that will be used to store the archive containing the
+######## a. Creating the bucket and associated policies that will be used to store the archive containing the
 ######## functions source code and dependencies #############################################################################
 ############################################################################################################################
 resource "random_pet" "lambdas_bucket_name" {
@@ -36,7 +36,7 @@ resource "aws_s3_bucket_public_access_block" "lambdas_bucket" {
 }
 
 ############################################################################################################
-######## 2.b. Packaging and copying the lambda functions to the S3 bucket ########
+######## b. Packaging and copying the lambda functions to the S3 bucket ########
 ############################################################################################################
 # createApplication lambda function
 data "archive_file" "lambda_create" {
@@ -115,7 +115,7 @@ resource "aws_s3_object" "lambda_update" {
 }
 
 ######################################################################################
-######## 2.c. Defining the lambda functions and related resources ###
+######## c. Defining the lambda functions and related resources ###
 ######################################################################################
 resource "aws_iam_role" "lambda_exec" {
   name = "serverless_lambda"

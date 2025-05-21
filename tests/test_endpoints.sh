@@ -152,7 +152,6 @@ fi
 
 echo "API test passed — application deleted successfully"
 
-
 echo "All API tests passed successfully!"
 
 

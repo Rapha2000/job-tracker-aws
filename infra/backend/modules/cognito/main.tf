@@ -1,5 +1,5 @@
 ######################################################################################
-######## 4. Creating the Cognito resources used for authentication and authorization
+######## Creating the Cognito resources used for authentication and authorization
 ######################################################################################
 
 ## a. Creating the user pool

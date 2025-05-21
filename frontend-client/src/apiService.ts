@@ -1,10 +1,5 @@
-import { use } from "react";
-// import config from "./config.json"; // should contain `apiUrl`
-import { v4 as uuidv4 } from "uuid";
-
 type Application = {
   user_id: string;
-//   job_id: string;
   company: string;
   position: string;
   status: string;
@@ -19,7 +14,6 @@ const getAuthHeaders = () => {
   const accessToken = sessionStorage.accessToken.toString()
 
   if (!accessToken) throw new Error("No access token found");
-  console.log("token: ", accessToken);
   return {
     "Content-Type": "application/json",
     Authorization: `Bearer ${accessToken}`,

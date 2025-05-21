@@ -1,5 +1,5 @@
 ######################################################################################
-######## 3. Creating the HTTP API Gateway that will be used to trigger the lambda functions
+######## Creating the HTTP API Gateway that will be used to trigger the lambda functions
 ######################################################################################
 resource "aws_apigatewayv2_api" "job_tracker_api" {
   name          = "job-tracker-api"
