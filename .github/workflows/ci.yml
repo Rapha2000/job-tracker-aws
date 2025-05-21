@@ -62,8 +62,8 @@ jobs:
         run: pip install black flake8
 
       - name: Run black (formatting check)
-        run: black --check ./backend/lambdas
+        run: black --check ./lambdas
 
       - name: Run flake8 (linting)
-        run: flake8 ./backend/lambdas --extend-ignore=E501
+        run: flake8 ./lambdas --extend-ignore=E501
     
