@@ -96,7 +96,7 @@ const HomePage = () => {
     user_id: user_email,
     company: "",
     position: "",
-    status: "",
+    status: "applied",
     date_applied: new Date().toISOString().split("T")[0],
     notes: "",
   });
