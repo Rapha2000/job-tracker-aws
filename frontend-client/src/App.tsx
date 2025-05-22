@@ -7,7 +7,7 @@ import HomePage from "./homePage";
 import ConfirmUserPage from "./confirmUserPage";
 import "./App.css";
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 const App = () => {
   const isAuthenticated = () => {

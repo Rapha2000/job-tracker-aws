@@ -11,7 +11,7 @@ import {
 } from "./apiService";
 import { getCurrentUserEmail } from "./authUtils"; 
 
-const USE_MOCK = true;
+const USE_MOCK = false;
 
 const MOCK_APPLICATIONS: Application[] = [
   {
@@ -35,6 +35,8 @@ const MOCK_APPLICATIONS: Application[] = [
     tags: ["nodejs", "aws"]
   }
 ];
+
+const STATUS_OPTIONS = ["applied", "first itw", "second itw", "refused"];
 
 type Application = {
   user_id: string;
@@ -97,7 +99,7 @@ const HomePage = () => {
     user_id: user_email,
     company: "",
     position: "",
-    status: "applied",
+    status: "",
     date_applied: new Date().toISOString().split("T")[0],
     notes: "",
     tags: [],
@@ -197,54 +199,74 @@ const HomePage = () => {
   };
 
   return (
-    <div className="homePage">
-      <h2>My Applications</h2>
-
-      {/* Form to create a new application */}
-      <div className="createForm">
-        <input
-          type="text"
-          placeholder="Company"
-          value={newApp.company}
-          onChange={(e) => setNewApp({ ...newApp, company: e.target.value })}
-        />
-        <input
-          type="text"
-          placeholder="Position"
-          value={newApp.position}
-          onChange={(e) => setNewApp({ ...newApp, position: e.target.value })}
-        />
-        <input
-          type="date"
-          value={newApp.date_applied}
-          onChange={(e) => setNewApp({ ...newApp, date_applied: e.target.value })}
-        />
-        <textarea
-          placeholder="Notes"
-          value={newApp.notes}
-          onChange={(e) => setNewApp({ ...newApp, notes: e.target.value })}
-        />
-        <button onClick={handleCreate}>Add</button>
+    <div style={{ padding: "2rem", maxWidth: "1000px", margin: "0 auto", fontFamily: "sans-serif" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "2rem" }}>
+        <h2>My Applications</h2>
+        <button onClick={handleLogout} style={{ padding: "8px 16px", background: "#444", color: "#fff", border: "none", borderRadius: "4px" }}>
+          Logout
+        </button>
       </div>
-      <button type="button" onClick={handleLogout}>
-        Logout
-      </button>
 
-      {/* array of applications */}
-      <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "Arial, sans-serif", fontSize: "14px" }}>
+      {/* Create Form */}
+      <div
+        style={{
+          marginBottom: "2rem",
+          padding: "1rem",
+          border: "1px solid #ddd",
+          borderRadius: "8px",
+          backgroundColor: "#f9f9f9",
+        }}
+      >
+        <h3 style={{ marginBottom: "1rem" }}>Add New Application</h3>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
+          <input
+            type="text"
+            placeholder="Company"
+            value={newApp.company}
+            onChange={(e) => setNewApp({ ...newApp, company: e.target.value })}
+            style={{ flex: "1", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
+          />
+          <input
+            type="text"
+            placeholder="Position"
+            value={newApp.position}
+            onChange={(e) => setNewApp({ ...newApp, position: e.target.value })}
+            style={{ flex: "1", padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
+          />
+          <select
+            value={newApp.status}
+            onChange={(e) => setNewApp({ ...newApp, status: e.target.value })}
+          >
+            {STATUS_OPTIONS.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+          <input
+            type="date"
+            value={newApp.date_applied}
+            onChange={(e) => setNewApp({ ...newApp, date_applied: e.target.value })}
+            style={{ padding: "8px", borderRadius: "4px", border: "1px solid #ccc" }}
+          />
+          <textarea
+            placeholder="Notes"
+            value={newApp.notes}
+            onChange={(e) => setNewApp({ ...newApp, notes: e.target.value })}
+            style={{ width: "100%", padding: "8px", borderRadius: "4px", border: "1px solid #ccc", marginTop: "0.5rem" }}
+          />
+          <button onClick={handleCreate} style={{ padding: "8px 16px", background: "#2c3e50", color: "#fff", border: "none", borderRadius: "4px" }}>
+            Add
+          </button>
+        </div>
+      </div>
+
+      {/* Applications Table */}
+      <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "14px" }}>
         <thead>
-          <tr style={{ backgroundColor: "#f4f4f4" }}>
+          <tr style={{ background: "#f0f0f0" }}>
             {["Company", "Position", "Status", "Date Applied", "Notes", "Tags", "Actions"].map((header) => (
-              <th
-                key={header}
-                style={{
-                  border: "1px solid #ddd",
-                  padding: "10px",
-                  textAlign: "left",
-                  color: "#333",
-                  fontWeight: "bold"
-                }}
-              >
+              <th key={header} style={{ padding: "10px", borderBottom: "1px solid #ccc", textAlign: "left" }}>
                 {header}
               </th>
             ))}
@@ -252,17 +274,22 @@ const HomePage = () => {
         </thead>
         <tbody>
           {applications.map((app) => (
-            <tr 
-              key={app.job_id}
-              style={{ backgroundColor: "#fff", borderBottom: "1px solid #eee" }}
-              onMouseEnter={(e) => e.currentTarget.style.backgroundColor = "#f9f9f9"}
-              onMouseLeave={(e) => e.currentTarget.style.backgroundColor = "#fff"}
-            >
+            <tr key={app.job_id} style={{ borderBottom: "1px solid #eee" }}>
               {editAppId === app.job_id ? (
                 <>
                   <td><input value={editFormData.company || ""} onChange={(e) => setEditFormData({ ...editFormData, company: e.target.value })} /></td>
                   <td><input value={editFormData.position || ""} onChange={(e) => setEditFormData({ ...editFormData, position: e.target.value })} /></td>
-                  <td><input value={editFormData.status || ""} onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value })} /></td>
+                  <td><select
+                        value={editFormData.status || ""}
+                        onChange={(e) => setEditFormData({ ...editFormData, status: e.target.value })}
+                      >
+                        {STATUS_OPTIONS.map((option) => (
+                          <option key={option} value={option}>
+                            {option}
+                          </option>
+                        ))}
+                      </select>
+                  </td>
                   <td><input type="date" value={editFormData.date_applied || ""} onChange={(e) => setEditFormData({ ...editFormData, date_applied: e.target.value })} /></td>
                   <td><textarea value={editFormData.notes || ""} onChange={(e) => setEditFormData({ ...editFormData, notes: e.target.value })} /></td>
                   <td><input value={(editFormData.tags || []).join(", ")} onChange={(e) => setEditFormData({ ...editFormData, tags: e.target.value.split(",").map(tag => tag.trim()) })} /></td>
@@ -284,12 +311,12 @@ const HomePage = () => {
                       onClick={() => handleEditClick(app)}
                       style={{
                         marginRight: "8px",
-                        backgroundColor: "#3498db",
-                        color: "white",
+                        backgroundColor: "#007bff",
+                        color: "#fff",
                         border: "none",
                         padding: "6px 10px",
                         borderRadius: "4px",
-                        cursor: "pointer"
+                        cursor: "pointer",
                       }}
                     >
                       Edit
@@ -297,12 +324,12 @@ const HomePage = () => {
                     <button
                       onClick={() => handleDelete(app.job_id!)}
                       style={{
-                        backgroundColor: "#e74c3c",
-                        color: "white",
+                        backgroundColor: "#dc3545",
+                        color: "#fff",
                         border: "none",
                         padding: "6px 10px",
                         borderRadius: "4px",
-                        cursor: "pointer"
+                        cursor: "pointer",
                       }}
                     >
                       Delete
