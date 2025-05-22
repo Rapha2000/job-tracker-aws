@@ -13,6 +13,29 @@ import { getCurrentUserEmail } from "./authUtils";
 
 const USE_MOCK = true;
 
+const MOCK_APPLICATIONS: Application[] = [
+  {
+    user_id: "mockuser@example.com",
+    job_id: "1",
+    company: "Acme Corp",
+    position: "Frontend Developer",
+    status: "applied",
+    date_applied: "2025-05-20",
+    notes: "Sent resume via LinkedIn.",
+    tags: ["react", "remote"]
+  },
+  {
+    user_id: "mockuser@example.com",
+    job_id: "2",
+    company: "Globex Inc",
+    position: "Backend Engineer",
+    status: "interview",
+    date_applied: "2025-05-15",
+    notes: "Phone interview scheduled.",
+    tags: ["nodejs", "aws"]
+  }
+];
+
 type Application = {
   user_id: string;
   job_id?: string;
@@ -39,8 +62,12 @@ function parseJwt(token) {
 
 const HomePage = () => {
   const navigate = useNavigate();
-  const idToken = parseJwt(sessionStorage.idToken.toString());
-  const accessToken = parseJwt(sessionStorage.accessToken.toString());
+
+  if (!USE_MOCK) {
+    const idToken = parseJwt(sessionStorage.idToken.toString());
+    const accessToken = parseJwt(sessionStorage.accessToken.toString());
+  }
+ 
   // console.log(
   //   `Amazon Cognito ID token encoded: ${sessionStorage.idToken.toString()}`,
   // );
@@ -64,7 +91,7 @@ const HomePage = () => {
   
   const [applications, setApplications] = useState<Application[]>([]);
   
-  const user_email = getCurrentUserEmail();
+  const user_email = getCurrentUserEmail(USE_MOCK);
   
   const [newApp, setNewApp] = useState<Omit<Application, "job_id">>({
     user_id: user_email,
@@ -79,21 +106,41 @@ const HomePage = () => {
   const [editAppId, setEditAppId] = useState<string | null>(null);
   const [editFormData, setEditFormData] = useState<Partial<Application>>({});
 
-  useEffect(() => {
-    if (!user_email) return;
+  if (!USE_MOCK) {
+    useEffect(() => {
+      if (!user_email) return;
 
-    const loadApplications = async () => {
-      try {
-        const apps = await fetchApplications(user_email);
-        setApplications(apps);
-      } catch (error) {
-        console.error("Error fetching applications:", error);
+      const loadApplications = async () => {
+        try {
+          const apps = await fetchApplications(user_email);
+          setApplications(apps);
+        } catch (error) {
+          console.error("Error fetching applications:", error);
+        }
+      };
+      loadApplications();
+    }, [user_email]);   
+  } else {
+    useEffect(() => {
+      if (!user_email) return;
+
+      if (USE_MOCK) {
+        setApplications(MOCK_APPLICATIONS);
+        return;
       }
-    };
 
-    loadApplications();
-  }, [user_email]);
+      const loadApplications = async () => {
+        try {
+          const apps = await fetchApplications(user_email);
+          setApplications(apps);
+        } catch (error) {
+          console.error("Error fetching applications:", error);
+        }
+      };
 
+      loadApplications();
+    }, [user_email]);
+  }
 
   const handleCreate = async () => {
     try {

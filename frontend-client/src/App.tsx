@@ -7,10 +7,16 @@ import HomePage from "./homePage";
 import ConfirmUserPage from "./confirmUserPage";
 import "./App.css";
 
+const USE_MOCK = true;
+
 const App = () => {
   const isAuthenticated = () => {
-    const accessToken = sessionStorage.getItem("accessToken");
-    return !!accessToken;
+    if (!USE_MOCK) {
+      const accessToken = sessionStorage.getItem("accessToken");
+      return !!accessToken;
+    } else {
+      return true;
+    }
   };
 
   return (
