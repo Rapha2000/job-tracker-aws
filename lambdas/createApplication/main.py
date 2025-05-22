@@ -32,7 +32,6 @@ def lambda_handler(event, context):
         status = body.get("status", "draft")
         date_applied = body.get("date_applied", datetime.utcnow().isoformat())
         notes = body.get("notes", "")
-        tags = body.get("tags", [])
 
         item = {
             "user_id": user_id,
@@ -42,7 +41,6 @@ def lambda_handler(event, context):
             "status": status,
             "date_applied": date_applied,
             "notes": notes,
-            "tags": tags,
         }
 
         table.put_item(Item=item)
@@ -82,6 +80,5 @@ def lambda_handler(event, context):
 #     "position": "Software Engineer",
 #     "status": "applied",
 #     "date_applied": "2025-04-25T15:00:00Z",
-#     "notes": "Resume attached",
-#     "tags": ["AI", "priority"]
+#     "notes": "Resume attached"
 #   }'

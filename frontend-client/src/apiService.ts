@@ -5,7 +5,6 @@ type Application = {
   status: string;
   date_applied: string;
   notes: string;
-  tags: string[];
 };
 
 

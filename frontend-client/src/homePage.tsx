@@ -22,7 +22,6 @@ const MOCK_APPLICATIONS: Application[] = [
     status: "applied",
     date_applied: "2025-05-20",
     notes: "Sent resume via LinkedIn.",
-    tags: ["react", "remote"]
   },
   {
     user_id: "mockuser@example.com",
@@ -32,7 +31,6 @@ const MOCK_APPLICATIONS: Application[] = [
     status: "interview",
     date_applied: "2025-05-15",
     notes: "Phone interview scheduled.",
-    tags: ["nodejs", "aws"]
   }
 ];
 
@@ -46,7 +44,6 @@ type Application = {
   status: string;
   date_applied: string;
   notes: string;
-  tags: string[];
 };
 
 function parseJwt(token) {
@@ -102,7 +99,6 @@ const HomePage = () => {
     status: "",
     date_applied: new Date().toISOString().split("T")[0],
     notes: "",
-    tags: [],
   });
 
   const [editAppId, setEditAppId] = useState<string | null>(null);
@@ -148,7 +144,7 @@ const HomePage = () => {
     try {
       const created = await createApplication(newApp);
       setApplications((prev) => [...prev, created]);
-      setNewApp({ ...newApp, company: "", position: "", notes: "", tags: [] });
+      setNewApp({ ...newApp, company: "", position: "", notes: "" });
     } catch (err) {
       console.error("Error creating app:", err);
     }
@@ -178,7 +174,6 @@ const HomePage = () => {
         status: editFormData.status!,
         date_applied: editFormData.date_applied!,
         notes: editFormData.notes!,
-        tags: editFormData.tags || [],
       };
       await updateApplication(user_email, editAppId, updates);
       setApplications((prev) =>
@@ -265,7 +260,7 @@ const HomePage = () => {
       <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "14px" }}>
         <thead>
           <tr style={{ background: "#f0f0f0" }}>
-            {["Company", "Position", "Status", "Date Applied", "Notes", "Tags", "Actions"].map((header) => (
+            {["Company", "Position", "Status", "Date Applied", "Notes", "Actions"].map((header) => (
               <th key={header} style={{ padding: "10px", borderBottom: "1px solid #ccc", textAlign: "left" }}>
                 {header}
               </th>
@@ -292,7 +287,6 @@ const HomePage = () => {
                   </td>
                   <td><input type="date" value={editFormData.date_applied || ""} onChange={(e) => setEditFormData({ ...editFormData, date_applied: e.target.value })} /></td>
                   <td><textarea value={editFormData.notes || ""} onChange={(e) => setEditFormData({ ...editFormData, notes: e.target.value })} /></td>
-                  <td><input value={(editFormData.tags || []).join(", ")} onChange={(e) => setEditFormData({ ...editFormData, tags: e.target.value.split(",").map(tag => tag.trim()) })} /></td>
                   <td>
                     <button onClick={handleSaveClick} style={{ marginRight: "6px" }}>Save</button>
                     <button onClick={handleCancelEdit}>Cancel</button>
@@ -305,7 +299,6 @@ const HomePage = () => {
                   <td>{app.status}</td>
                   <td>{app.date_applied}</td>
                   <td>{app.notes}</td>
-                  <td>{app.tags.join(", ")}</td>
                   <td>
                     <button
                       onClick={() => handleEditClick(app)}

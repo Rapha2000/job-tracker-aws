@@ -16,8 +16,7 @@ RESPONSE=$(curl --fail -s -X POST "$API_URL/createApplication" \
     "position": "Software Engineer",
     "status": "applied",
     "date_applied": "2025-04-25T15:00:00Z",
-    "notes": "Resume attached",
-    "tags": ["AI", "priority"]
+    "notes": "Resume attached"
   }')
 
 echo "Raw response:"

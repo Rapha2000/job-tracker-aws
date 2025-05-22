@@ -34,7 +34,6 @@ def lambda_handler(event, context):
             "status",
             "date_applied",
             "notes",
-            "tags",
         ]
         expression_parts = []
         expression_values = {}
