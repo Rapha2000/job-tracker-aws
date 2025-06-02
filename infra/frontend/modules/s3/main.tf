@@ -43,7 +43,7 @@ resource "aws_s3_object" "static_site_upload_object" {
       ".js"   = "application/javascript"
       "svg"   = "image/svg+xml"
     },
-    regex("\\.[^.]+$", each.value), // ou fileext(each.value) si dispo dans ton Terraform
+    regex("\\.[^.]+$", each.value),
     "application/octet-stream"
   )
   depends_on = [
